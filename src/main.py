@@ -80,6 +80,8 @@ async def main_manager() -> None:
     while bot_mode not in EXIT_CMD:
         intents = discord.Intents.default()
         intents.message_content = True
+        intents.voice_states = True
+        intents.members = True
         if bot_mode == CMD_MAIN:
             print(f"{C.cyan}[info] Starting Main Bot...{C.default}")  # VAR
             current_bot = DiscordBot(intents=intents, db=db_pool)

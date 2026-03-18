@@ -180,3 +180,19 @@ CREATE TABLE IF NOT EXISTS channels
     PRIMARY KEY (guild_id)
 ) DEFAULT CHARSET = 'utf8mb4'
 ;
+
+
+-- voice logging table
+CREATE TABLE voice
+(
+    id           BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id      BIGINT       NOT NULL,
+    user_name    VARCHAR(100) NOT NULL,
+    display_name VARCHAR(100) NOT NULL,
+    channel      VARCHAR(200) NOT NULL,
+    joined_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    left_at      TIMESTAMP    NULL     DEFAULT NULL,
+    duration_sec INT          NULL     DEFAULT NULL,
+    INDEX idx_open_session (user_id, left_at)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;

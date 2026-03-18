@@ -51,6 +51,7 @@ class DiscordBot(commands.Bot):
             "trade",
             "complain",
             "user_warn",
+            "voice_log",
             # tasks
             "tasks.week_start_noti",
             "tasks.check_new_content",

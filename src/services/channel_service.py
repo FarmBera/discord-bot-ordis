@@ -8,7 +8,7 @@ CHANNELS = yaml_open("config/channel")
 
 class ChannelService:
     @staticmethod
-    async def getChannels(interact: discord.Interaction) -> dict | None:
+    async def getChannels(interact: discord.Interaction = None) -> dict | None:
         return CHANNELS
 
         pool = interact.client.db
