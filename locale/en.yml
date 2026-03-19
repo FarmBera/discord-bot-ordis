@@ -684,7 +684,7 @@ cmd:
     info: |
       # Before submitting a complaint, please carefully review the following information.
       ### This feature only accepts inquiries related to the {SERVER_NAME} server.
-      - For bot-related inquiries, please refer to [here]({HOMEPAGE}/?id=contact) and contact us separately.
+      - For bot-related inquiries, please refer to [here]({HOMEPAGE}/contact) and contact us separately.
 
       - Once submitted, your content cannot be edited. Please write carefully.
       - Server rules apply equally to submitted posts.
