@@ -9,6 +9,7 @@ from src.utils.db_helper import query_reader
 from src.utils.logging_utils import save_log
 from src.utils.permission import is_admin_user
 from src.utils.return_err import return_traceback
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 from src.views.user_warn_view import pf, WarnInputModal
 
@@ -44,6 +45,8 @@ class UserWarnCommands(commands.Cog):
         if not await is_admin_user(
             interact, cmd=f"{LOG_TYPE.cmd}.user-ban", notify=True
         ):
+            return
+        if not await check_consent(interact):
             return
 
         try:

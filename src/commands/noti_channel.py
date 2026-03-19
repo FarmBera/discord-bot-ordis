@@ -30,6 +30,7 @@ from src.translator import ts
 from src.utils.db_helper import transaction
 from src.utils.logging_utils import save_log
 from src.utils.return_err import return_traceback
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 
 DB_COLUMN_MAP = {
@@ -414,6 +415,8 @@ class UnSettingView(discord.ui.View):
 
 async def noti_subscribe_helper(interact: discord.Interaction):
     await interact.response.defer(ephemeral=True)
+    if not await check_consent(interact, isFollowUp=True):
+        return
 
     current_subs = await fetch_current_subscriptions(
         interact.client.db, interact.channel_id
@@ -437,6 +440,8 @@ async def noti_subscribe_helper(interact: discord.Interaction):
 
 async def noti_unsubscribe_helper(interact: discord.Interaction):
     await interact.response.defer(ephemeral=True)
+    if not await check_consent(interact, isFollowUp=True):
+        return
 
     current_subs = await fetch_current_subscriptions(
         interact.client.db, interact.channel_id

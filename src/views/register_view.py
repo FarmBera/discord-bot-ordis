@@ -5,6 +5,7 @@ from src.translator import ts
 from src.services.channel_service import ChannelService
 from src.utils.logging_utils import save_log
 from src.utils.return_err import return_traceback
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 
 KEY_PARTY: str = "party_ch"
@@ -124,6 +125,8 @@ class RegisterView(discord.ui.View):
 
 async def register_cmd_helper(interact: discord.Interaction):
     await interact.response.defer(ephemeral=True)
+    if not await check_consent(interact, isFollowUp=True):
+        return
 
     ch: dict = await fetch_channel(interact)
     output: str = parse_channel(interact, ch)

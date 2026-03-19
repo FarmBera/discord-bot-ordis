@@ -110,6 +110,8 @@ async def cmd_helper_txt(
 ) -> None:
     if await is_banned_user(interact):
         return
+    if await check_consent(interact):
+        return
 
     if not isPrivateMsg:
         is_admin = await is_admin_user(interact=interact, cmd=f"{file_name}")
