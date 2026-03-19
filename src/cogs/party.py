@@ -11,6 +11,7 @@ from src.translator import ts
 from src.utils.logging_utils import save_log
 from src.utils.permission import is_banned_user
 from src.utils.return_err import return_traceback
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 from src.views.party_view import pf, MIN_SIZE, MAX_SIZE
 
@@ -49,6 +50,8 @@ class PartyCog(commands.Cog):
             obj=f"T:{title}\nTYPE:{game_name}\nDEPT:{departure}\nDESC:{descriptions}\n{number_of_user}",
         )
         if await is_banned_user(interact, isFollowUp=True):
+            return
+        if not await check_consent(interact, isFollowUp=True):
             return
 
         # get channel

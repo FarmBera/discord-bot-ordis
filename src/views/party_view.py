@@ -21,6 +21,7 @@ from src.utils.permission import (
 )
 from src.utils.return_err import return_traceback
 from src.utils.times import convert_remain, parseKoreanDatetime
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 
 pf = "cmd.party."
@@ -578,6 +579,8 @@ class PartyView(ui.View):
         if await is_cooldown(interact, cooldown_action):
             return False
         if not skip_banned and await is_banned_user(interact):
+            return False
+        if not await check_consent(interact):
             return False
 
         party, participants = await PartyService.get_party_by_message_id(

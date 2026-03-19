@@ -195,4 +195,16 @@ CREATE TABLE voice
     duration_sec INT          NULL     DEFAULT NULL,
     INDEX idx_open_session (user_id, left_at)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+;
+
+
+-- save user license agreement status
+CREATE TABLE consent
+(
+    user_id      BIGINT PRIMARY KEY,
+    user_name    VARCHAR(100) NOT NULL,
+    display_name VARCHAR(100) NOT NULL,
+    agreed_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    tos_version  VARCHAR(16)  NOT NULL -- e.g. '1.0', '1.1'
+);

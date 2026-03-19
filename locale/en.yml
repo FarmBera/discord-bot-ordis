@@ -831,3 +831,30 @@ cmd:
     title: "# Daily/Weekly Nightwave Quests\n"
     expiry: "> Expiry: {time}"
     output: "\n- **{value}**: {desc}"
+
+  consent:
+    # Step 1: Terms notice
+    notice: |
+      # 📋 Terms of Service Agreement
+      You must agree to the Terms of Service and Privacy Policy before using the Ordis bot.
+      Please review each document and click **Agree** to proceed.
+      ## [📄 Terms of Service]({HOMEPAGE}/tos)
+      ## [🔒 Privacy Policy]({HOMEPAGE}/privacy)
+    version: "Terms version: v{ver}"
+    btn-agree: "Agree"
+    btn-disagree: "Decline"
+
+    # Step 2: Final confirmation
+    confirm-notice: |
+      # ⚠️ Final Confirmation
+      I have fully read and understood the **Terms of Service** and **Privacy Policy**, and I agree to them.
+    btn-confirm: "I Agree"
+    btn-cancel: "Cancel"
+
+    # Result messages
+    agreed: "✅ You have agreed to the Terms of Service. You can now freely use the bot!"
+    cancelled: "❌ Terms of Service agreement has been cancelled. Agreement is required to use bot features."
+
+    # Errors
+    err-not-owner: "Only the original user can proceed with this agreement."
+    err-save: "An error occurred while saving your agreement. Please try again later."

@@ -10,6 +10,7 @@ from src.utils.file_io import open_file_async
 from src.utils.logging_utils import save_log
 from src.utils.permission import is_admin_user, is_banned_user
 from src.utils.return_err import err_embed, return_traceback
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportMasterView, SupportView
 
 
@@ -25,6 +26,8 @@ async def cmd_helper(
     skipGetObj: bool = False,
 ) -> None:
     if await is_banned_user(interact):
+        return
+    if not await check_consent(interact):
         return
 
     # check admin if user want to send public msg

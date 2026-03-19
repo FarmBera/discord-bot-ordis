@@ -9,6 +9,7 @@ from src.services.channel_service import ChannelService
 from src.translator import ts
 from src.utils.logging_utils import save_log
 from src.views.complain_view import pf, ApplyButtonView
+from src.views.consent_view import check_consent
 
 complain_guide: discord.Embed = discord.Embed(
     description=ts.get(f"{pf}info").format(SERVER_NAME=SERVER_NAME, HOMEPAGE=HOMEPAGE),
@@ -26,6 +27,9 @@ class ComplainCommands(commands.Cog):
     )
     async def cmd_receive_complain(self, interact: discord.Interaction) -> None:
         await interact.response.defer(ephemeral=True)
+
+        if not await check_consent(interact):
+            return
 
         # get channel
         channel_list = await ChannelService.getChannels(interact)

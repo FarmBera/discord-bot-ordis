@@ -16,6 +16,7 @@ from src.utils.permission import (
     is_banned_user,
 )
 from src.utils.return_err import return_traceback
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 
 pf = "cmd.trade."
@@ -517,6 +518,8 @@ class TradeView(ui.View):
         if await is_cooldown(interact, cd):
             return False
         if await is_banned_user(interact):
+            return False
+        if await check_consent(interact, isFollowUp=True):
             return False
 
         trade_data = await TradeService.get_trade_by_message_id(

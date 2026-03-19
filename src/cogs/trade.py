@@ -12,6 +12,7 @@ from src.translator import ts
 from src.utils.logging_utils import save_log
 from src.utils.permission import is_banned_user
 from src.utils.return_err import return_traceback
+from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 from src.views.trade_view import parseNickname
 
@@ -50,10 +51,12 @@ class TradeCog(commands.Cog):
         price: int = 0,
         quantity: int = 1,
     ):
-        if await is_banned_user(interact, isFollowUp=False):
-            return
-
         await interact.response.defer(ephemeral=True)
+
+        if await is_banned_user(interact, isFollowUp=True):
+            return
+        if not await check_consent(interact, isFollowUp=True):
+            return
 
         # get channel
         channel_list = await ChannelService.getChannels(interact)
