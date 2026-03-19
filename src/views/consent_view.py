@@ -16,7 +16,7 @@ pf = "cmd.consent."
 # step 1
 class ConsentView(ui.View):
     def __init__(self, interact: discord.Interaction):
-        super().__init__(timeout=900)
+        super().__init__()
         self.interact = interact
 
     @staticmethod
@@ -121,14 +121,14 @@ class ConsentView(ui.View):
 # step 2: final check
 class ConsentConfirmView(ui.View):
     def __init__(self, interact: discord.Interaction):
-        super().__init__(timeout=30)
+        super().__init__(timeout=60)
         self.interact = interact
 
     @staticmethod
     def build_confirm_embed() -> discord.Embed:
         embed = discord.Embed(
             description=ts.get(f"{pf}confirm-notice"),
-            color=discord.Color.orange(),
+            color=discord.Color.yellow(),
         )
         embed.set_footer(text=ts.get(f"{pf}version").format(ver=CURRENT_TOS_VERSION))
         return embed
