@@ -519,7 +519,7 @@ class TradeView(ui.View):
             return False
         if await is_banned_user(interact):
             return False
-        if await check_consent(interact, isFollowUp=True):
+        if not await check_consent(interact):
             return False
 
         trade_data = await TradeService.get_trade_by_message_id(
