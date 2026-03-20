@@ -13,10 +13,9 @@ from src.views.help_view import SupportView
 pf = "cmd.consent."
 
 
-# step 1
 class ConsentView(ui.View):
     def __init__(self, interact: discord.Interaction):
-        super().__init__()
+        super().__init__(timeout=300)
         self.interact = interact
 
     @staticmethod
@@ -75,104 +74,6 @@ class ConsentView(ui.View):
             msg="ConsentView -> agree_button clicked",
         )
 
-        # 본인 확인
-        if interact.user.id != self.interact.user.id:
-            await interact.response.send_message(
-                ts.get(f"{pf}err-not-owner"), ephemeral=True
-            )
-            return
-
-        confirm_view = ConsentConfirmView(self.interact)
-        confirm_embed = ConsentConfirmView.build_confirm_embed()
-        await interact.response.edit_message(
-            embed=confirm_embed,
-            view=confirm_view,
-        )
-        self.stop()
-
-    @ui.button(
-        label=ts.get(f"{pf}btn-disagree"),
-        style=discord.ButtonStyle.secondary,
-    )
-    async def disagree_button(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "ConsentView.btn.disagree"
-        await save_log(
-            pool=interact.client.db,
-            type=LOG_TYPE.event,
-            cmd=cmd,
-            interact=interact,
-            msg="ConsentView -> disagree_button clicked",
-        )
-
-        if interact.user.id != self.interact.user.id:
-            await interact.response.send_message(
-                ts.get(f"{pf}err-not-owner"), ephemeral=True
-            )
-            return
-
-        await interact.response.edit_message(
-            content=ts.get(f"{pf}cancelled"),
-            embed=None,
-            view=None,
-        )
-        self.stop()
-
-
-# step 2: final check
-class ConsentConfirmView(ui.View):
-    def __init__(self, interact: discord.Interaction):
-        super().__init__(timeout=60)
-        self.interact = interact
-
-    @staticmethod
-    def build_confirm_embed() -> discord.Embed:
-        embed = discord.Embed(
-            description=ts.get(f"{pf}confirm-notice"),
-            color=discord.Color.yellow(),
-        )
-        embed.set_footer(text=ts.get(f"{pf}version").format(ver=CURRENT_TOS_VERSION))
-        return embed
-
-    async def on_timeout(self):
-        cmd = "ConsentConfirmView.timeout"
-        try:
-            await self.interact.edit_original_response(
-                content=ts.get("cmd.err-timeout"),
-                embed=None,
-                view=None,
-            )
-            await save_log(
-                pool=self.interact.client.db,
-                type=LOG_TYPE.event,
-                cmd=cmd,
-                interact=self.interact,
-                msg="ConsentConfirmView -> timeout",
-            )
-        except discord.NotFound:
-            await save_log(
-                pool=self.interact.client.db,
-                type=LOG_TYPE.info,
-                cmd=cmd,
-                interact=self.interact,
-                msg="ConsentConfirmView -> timeout, but Not Found",
-            )
-        except Exception:
-            await save_log(
-                pool=self.interact.client.db,
-                type=LOG_TYPE.err,
-                cmd=cmd,
-                interact=self.interact,
-                msg="ConsentConfirmView -> timeout, but ERR",
-                obj=return_traceback(),
-            )
-
-    @ui.button(
-        label=ts.get(f"{pf}btn-confirm"),
-        style=discord.ButtonStyle.success,
-    )
-    async def confirm_button(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "ConsentConfirmView.btn.confirm"
-
         if interact.user.id != self.interact.user.id:
             await interact.response.send_message(
                 ts.get(f"{pf}err-not-owner"), ephemeral=True
@@ -211,11 +112,11 @@ class ConsentConfirmView(ui.View):
         self.stop()
 
     @ui.button(
-        label=ts.get(f"{pf}btn-cancel"),
-        style=discord.ButtonStyle.secondary,
+        label=ts.get(f"{pf}btn-disagree"),
+        style=discord.ButtonStyle.danger,
     )
-    async def cancel_button(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "ConsentConfirmView.btn.cancel"
+    async def disagree_button(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "ConsentView.btn.disagree"
 
         if interact.user.id != self.interact.user.id:
             await interact.response.send_message(
