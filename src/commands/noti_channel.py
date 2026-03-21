@@ -187,7 +187,6 @@ class NotificationSelect(discord.ui.Select):
         bot_name = interact.client.user.display_name
         webhooks = await interact.channel.webhooks()
         webhook = discord.utils.get(webhooks, name=bot_name)
-
         if not webhook:
             try:
                 # get bot avatar
@@ -201,12 +200,11 @@ class NotificationSelect(discord.ui.Select):
             except Exception:
                 webhook = await interact.channel.create_webhook(name=bot_name)
 
+        # create sql query
         sql_base = "INSERT INTO webhooks (channel_id, guild_id, webhook_url, note, {cols}) VALUES (%s, %s, %s, %s, {vals}) ON DUPLICATE KEY UPDATE webhook_url=%s{updates}"
-
         col_names = []
         val_placeholders = []
         update_clauses = []
-
         insert_values = [
             interact.channel_id,
             interact.guild_id,
@@ -235,8 +233,8 @@ class NotificationSelect(discord.ui.Select):
             vals=", ".join(val_placeholders),
             updates=updates_sql,
         )
-        # print(final_sql, insert_values + update_values)
 
+        # send sql query
         try:
             async with transaction(interact.client.db) as cursor:
                 await cursor.execute(final_sql, insert_values + update_values)

@@ -26,13 +26,7 @@ class ChannelService:
 
         fetched_id = channels.get("guild_id")
 
-        if not fetched_id:
-            return None
-
-        if fetched_id != guild_id:
-            return None
-
-        if not channels.get("is_allowed"):
+        if not fetched_id or fetched_id != guild_id or not channels.get("is_allowed"):
             return None
 
         return channels
