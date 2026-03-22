@@ -1,6 +1,7 @@
-import json
+from pathlib import Path
 
 import aiofiles
+import orjson
 import yaml
 
 from src.constants.color import C
@@ -55,13 +56,12 @@ def json_load(file_path) -> dict | None:
         None: file not found || parse error
     """
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
+        data = orjson.loads(Path(file_path).read_bytes())
         return data
     except FileNotFoundError:
         print(f"{C.yellow}ERR: File Not Found > {file_path}{C.default}")
         return None
-    except json.JSONDecodeError:
+    except orjson.JSONDecodeError:
         print(f"{C.yellow}ERR: JSON Decode Exception > {file_path}{C.default}")
         return None
     except Exception as e:
@@ -81,8 +81,7 @@ def json_save(data, file_path) -> bool:
         bool: save success True, failed to save
     """
     try:
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        Path(file_path).write_bytes(orjson.dumps(data, option=orjson.OPT_INDENT_2))
         return True
     except TypeError as e:
         print(f"{C.red}[err] Convertion Error > {e}")
@@ -158,16 +157,16 @@ async def json_load_async(file_path) -> dict | None:
         None: file not found || parse error
     """
     try:
-        async with aiofiles.open(file_path, "r", encoding="utf-8") as f:
+        async with aiofiles.open(file_path, "rb") as f:
             content = await f.read()
 
-        data = json.loads(content)
+        data = orjson.loads(content)
         return data
 
     except FileNotFoundError:
         print(f"{C.yellow}ERR: File Not Found > {file_path}{C.default}")
         return None
-    except json.JSONDecodeError:
+    except orjson.JSONDecodeError:
         print(f"{C.yellow}ERR: JSON Decode Exception > {file_path}{C.default}")
         return None
     except Exception as e:
@@ -187,9 +186,9 @@ async def json_save_async(data, file_path) -> bool:
         bool: save success True, failed to save
     """
     try:
-        content = json.dumps(data, ensure_ascii=False, indent=4)
+        content = orjson.dumps(data, option=orjson.OPT_INDENT_2)
 
-        async with aiofiles.open(file_path, "w", encoding="utf-8") as f:
+        async with aiofiles.open(file_path, "wb") as f:
             await f.write(content)
         return True
     except TypeError as e:

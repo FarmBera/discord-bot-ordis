@@ -17,7 +17,7 @@ def getThumbImg(origin_name: str) -> str:
     if not origin_name:
         return ""
 
-    parsed_name = getItemName(origin_name).lower()
+    parsed_name = getItemName(origin_name).lower().replace(" ", "-")
 
     # find cached
     cached_name = IMAGE_CACHE.get(parsed_name, None)
@@ -26,7 +26,6 @@ def getThumbImg(origin_name: str) -> str:
 
     # find items in directory
     for item in IMAGE_ORIGIN:
-        parsed_name = parsed_name.replace(" ", "-")
         finding_name = item.replace(f"-{item.split('-')[-1]}", "")
 
         if parsed_name == finding_name:

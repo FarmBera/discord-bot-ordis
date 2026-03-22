@@ -14,10 +14,11 @@ pf: str = "cmd.arbitration."
 def w_arbitration(ts=_ts, lang=_default_lang) -> discord.Embed:
     cnt: int = 0  # count
     curr_arbi: dict = {}
+    current: int = timeNow()
 
     # search current data
     for item in ARBITRATION:
-        if item["time"] > timeNow():
+        if item["time"] > current:
             curr_arbi = ARBITRATION[cnt - 1]
             break
         cnt += 1

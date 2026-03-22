@@ -5,14 +5,22 @@ import sys
 import aiomysql
 import discord
 
-from config.TOKEN import TOKEN as BOT_TOKEN, DB_USER, DB_PW, DB_HOST, DB_PORT, DB_NAME
+from config.TOKEN import (
+    TOKEN as BOT_TOKEN,
+    DB_USER,
+    DB_PW,
+    DB_HOST,
+    DB_PORT,
+    DB_NAME,
+    DEBUG_MODE,
+)
 from config.config import LOG_TYPE
 from src.client.bot_main import DiscordBot
 from src.client.bot_maintenance import MaintanceBot
 from src.constants.color import C
 from src.translator import ts
 from src.utils.logging_utils import save_log
-from src.utils.return_err import return_traceback
+from src.utils.return_err import return_traceback, print_test_err
 
 discord.utils.setup_logging(level=logging.INFO, root=False)
 
@@ -106,7 +114,7 @@ async def main_manager() -> None:
                     await save_log(
                         pool=db_pool, type=LOG_TYPE.err, msg=msg, obj=return_traceback()
                     )
-                    print(msg)
+                    print_test_err() if DEBUG_MODE else print(msg)
 
         elif bot_mode == CMD_MAINTENANCE:
             print(f"{C.magenta}Starting Maintenance Bot...{C.default}", end=" ")  # VAR
@@ -136,6 +144,8 @@ async def main_manager() -> None:
             print(
                 f"{C.red}[err] The Bot has unexpectedly terminated!{C.default}"
             )  # VAR
+            if DEBUG_MODE:
+                print_test_err()
 
             for i in range(5, 0, -1):
                 print(
