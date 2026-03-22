@@ -1,8 +1,15 @@
+# PRIVATE FUNC
+def extractID(obj_prev, obj_new):
+    return (
+        {item["_id"]["$oid"] for item in obj_prev},
+        {item["_id"]["$oid"] for item in obj_new},
+    )
+
+
 def checkMissingIds(obj_prev, obj_new):
     should_save_data: bool = False
 
-    prev_ids = {item["_id"]["$oid"] for item in obj_prev}
-    new_ids = {item["_id"]["$oid"] for item in obj_new}
+    prev_ids, new_ids = extractID(obj_prev, obj_new)
 
     if prev_ids != new_ids:
         should_save_data = True
@@ -14,3 +21,8 @@ def checkMissingIds(obj_prev, obj_new):
 
 def checkMissingItem(obj_new, newly_added_ids):
     return [item for item in obj_new if item["_id"]["$oid"] in newly_added_ids]
+
+
+def checkExpiredItem(obj_prev, obj_new):
+    prev_ids, new_ids = extractID(obj_prev, obj_new)
+    return prev_ids != new_ids

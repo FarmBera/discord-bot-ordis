@@ -9,6 +9,7 @@ from src.handler.handle_archimedea import handleDeepArchimedea, handleTemporalAr
 from src.handler.handle_duviri import checkCircuitWarframe, checkCircuitIncarnon
 from src.handler.handle_error import handleParseError
 from src.handler.handle_invasions import checkInvasions
+from src.handler.handle_missing import checkExpiredItem
 from src.handler.handle_missing import checkMissingIds, checkMissingItem
 from src.handler.handle_news import processNews
 from src.handler.handle_voidtrader import handleVoidTrader
@@ -77,11 +78,12 @@ class TASKcheck_new_content(commands.Cog):
 
     async def _handle_missing(self, handler, origin_key, key, obj_prev, obj_new):
         should_save, newly_added_ids = checkMissingIds(obj_prev, obj_new)
+        should_save = should_save or checkExpiredItem(obj_prev, obj_new)
         if not newly_added_ids:
-            return None
+            return None, should_save
         missing_items = checkMissingItem(obj_new, newly_added_ids)
         if not missing_items:
-            return None
+            return None, should_save
         factory = await self._safe_parse(handler, origin_key, missing_items)
         return factory, should_save
 
