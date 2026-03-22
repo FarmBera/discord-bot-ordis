@@ -660,7 +660,7 @@ cmd:
     circuit: Circuit # 두비리 순환로
     curr-rotate: Current Rotation
     next-rotate: Next Rotation
-    end: "Ends {day}"
+    end: "Rotates {day}"
     coming: "After {day}"
 
   events:
@@ -670,7 +670,7 @@ cmd:
 
     title: "# Periodic Event: {count}"
     process: "- Progress: **{perc} %**"
-    exp: "- Event ends **{time}**"
+    exp: "- Expiry: **{time}**"
     reward-title: "### Reward List\n"
 
     miss-title: "### Mission"

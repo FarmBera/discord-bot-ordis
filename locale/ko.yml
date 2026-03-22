@@ -670,7 +670,7 @@ cmd:
 
     title: "# 정기 이벤트: {count}개"
     process: "- 진행률: **{perc} %**"
-    exp: "- **{time}** 이벤트가 종료됩니다."
+    exp: "- **{time}** 종료"
     reward-title: "### 보상 목록\n"
 
     miss-title: "### 미션 정보"

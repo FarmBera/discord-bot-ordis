@@ -36,7 +36,7 @@ def w_events(events, ts=_ts, lang=_default_lang) -> discord.Embed:
         # expiry
         output_msg += f"{ts.get(f'{pf}exp').format(time=convert_remain(e['Expiry']['$date']['$numberLong']))}\n"
         # mission info
-        if e.get("MissionInfo", None):
+        if e.get("MissionInfo"):
             ee = e["MissionInfo"]
             output_msg += f"""{ts.get(f'{pf}miss-title')}
 {ts.get(f'{pf}miss-info').format(type=getMissionType(ee['missionType'], lang), loc=getSolNode(ee['location'], lang), min=ee['minEnemyLevel'], max=ee['maxEnemyLevel'])}
@@ -54,13 +54,14 @@ def w_events(events, ts=_ts, lang=_default_lang) -> discord.Embed:
                 )
         # rewards title
         output_msg += ts.get(f"{pf}reward-title")
+        has_interim: bool = e.get("InterimGoals") and e.get("InterimRewards")
         # rewards list
-        if e.get("InterimGoals") and e.get("InterimRewards"):
+        if has_interim:
             for i in range(len(e.get("InterimGoals"))):
                 output_msg += f"- {e['InterimGoals'][i]}% : {", ".join([getLanguage(item, lang=lang) for item in e['InterimRewards'][i]['items'] ])}\n"
         # final rewards
         if e.get("Reward"):
-            output_msg += f"- 100% : "
+            output_msg += "- 100% : " if has_interim else "- "
             # credit
             output_msg += (
                 f"{e['Reward']['credits']:,} {get_emoji('credit')}, "
@@ -86,3 +87,8 @@ def w_events(events, ts=_ts, lang=_default_lang) -> discord.Embed:
     #     embed.set_image(url=img_url)
 
     return embed
+
+
+# from src.constants.keys import EVENTS
+# from src.utils.data_manager import get_obj
+# print(w_events(get_obj(EVENTS)).description)
