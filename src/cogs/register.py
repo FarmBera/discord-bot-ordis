@@ -590,8 +590,7 @@ class GeneralCommands(commands.Cog):
         if not await is_super_user(interact, "check-queue", True, True):
             return
 
-        desc: str = "# Processing Queue Status\n"
-        desc += get_queue_status()
+        desc: str = f"# Processing Queue Status\n{get_queue_status()}"
         await interact.followup.send(
             embed=discord.Embed(description=desc, color=discord.Color.darker_grey())
         )

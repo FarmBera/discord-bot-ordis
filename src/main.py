@@ -18,6 +18,7 @@ from config.config import LOG_TYPE
 from src.client.bot_main import DiscordBot
 from src.client.bot_maintenance import MaintanceBot
 from src.constants.color import C
+from src.services.queue_manager import get_queue_status
 from src.translator import ts
 from src.utils.logging_utils import save_log
 from src.utils.return_err import return_traceback, print_test_err
@@ -33,6 +34,7 @@ ERR_COUNT: int = 0
 CMD_MAIN: str = "main"
 CMD_MAINTENANCE: str = "maintenance"
 CMD_EXIT: str = "exit"
+CMD_EXIT_FORCE: str = "exit1"
 
 EXIT_CMD: list = [CMD_EXIT, "ㄷ턋", "멱ㅓ"]
 
@@ -45,7 +47,7 @@ async def console_input_listener() -> str | None:
         cmd = await asyncio.to_thread(sys.stdin.readline)
         cmd = cmd.strip().lower()
 
-        if cmd in [CMD_MAIN, CMD_MAINTENANCE] + EXIT_CMD:
+        if cmd in [CMD_MAIN, CMD_MAINTENANCE, CMD_EXIT_FORCE] + EXIT_CMD:
             print(f"[info] Console input detected! '{cmd}'")  # VAR
             return cmd
         else:
@@ -85,7 +87,7 @@ async def main_manager() -> None:
         )
         sys.exit(1)
 
-    while bot_mode not in EXIT_CMD:
+    while bot_mode not in EXIT_CMD and bot_mode != CMD_EXIT_FORCE:
         intents = discord.Intents.default()
         intents.message_content = True
         intents.voice_states = True
@@ -128,34 +130,55 @@ async def main_manager() -> None:
         bot_task = asyncio.create_task(current_bot.start(BOT_TOKEN))
         console_task = asyncio.create_task(console_input_listener())
 
-        # wait until at least one of the two tasks is completed.
-        done, pending = await asyncio.wait(
-            [bot_task, console_task], return_when=asyncio.FIRST_COMPLETED
-        )
+        proceed = False
+        while not proceed:
+            # wait until at least one of the two tasks is completed.
+            done, pending = await asyncio.wait(
+                [bot_task, console_task], return_when=asyncio.FIRST_COMPLETED
+            )
 
-        # verify the completed task is a console input task
-        if console_task in done:
-            # get input command
-            new_mode = console_task.result()
-            if new_mode not in EXIT_CMD:
-                print(f"Switching Bot... '{bot_mode}' into '{new_mode}'")  # VAR
-            bot_mode = new_mode
-        else:
-            print(
-                f"{C.red}[err] The Bot has unexpectedly terminated!{C.default}"
-            )  # VAR
-            if DEBUG_MODE:
-                print_test_err()
+            # verify the completed task is a console input task
+            if console_task in done:
+                # get input command
+                new_mode = console_task.result()
 
-            for i in range(5, 0, -1):
+                if new_mode == CMD_EXIT_FORCE:
+                    # force exit: bypass queue check
+                    bot_mode = new_mode
+                    proceed = True
+                elif new_mode in EXIT_CMD:
+                    # graceful exit: check pending queue
+                    queue_count = get_queue_status()
+                    if queue_count != 0:
+                        print(
+                            f"{C.yellow}[warn] Processing Queue is not empty >> Pending tasks: {queue_count}\n"
+                            f"[warn] Use '{CMD_EXIT_FORCE}' to force exit.{C.default}"
+                        )
+                        # re-listen for console input without restarting bot
+                        console_task = asyncio.create_task(console_input_listener())
+                    else:
+                        bot_mode = new_mode
+                        proceed = True
+                else:
+                    print(f"Switching Bot... '{bot_mode}' into '{new_mode}'")  # VAR
+                    bot_mode = new_mode
+                    proceed = True
+            else:
                 print(
-                    f"{C.red}[err] Unexpect Error. Retry in {i}s ",
-                    end="\r",
-                    flush=True,
+                    f"{C.red}[err] The Bot has unexpectedly terminated!{C.default}"
                 )  # VAR
-                await asyncio.sleep(1.0)
-            print(f"{C.yellow}Retrying #{ERR_COUNT}{C.default}")
-            # bot_mode = "exit"  # exit loop
+                if DEBUG_MODE:
+                    print_test_err()
+
+                for i in range(5, 0, -1):
+                    print(
+                        f"{C.red}[err] Unexpect Error. Retry in {i}s ",
+                        end="\r",
+                        flush=True,
+                    )  # VAR
+                    await asyncio.sleep(1.0)
+                print(f"{C.yellow}Retrying #{ERR_COUNT}{C.default}")
+                proceed = True
 
         # quit currently running bot & skip to next loop
         print(f"{C.default}[info] Terminating current bot...")  # VAR
@@ -164,7 +187,7 @@ async def main_manager() -> None:
         for task in pending:  # cancel remaining task
             task.cancel()
 
-        if bot_mode not in EXIT_CMD:
+        if bot_mode not in EXIT_CMD and bot_mode != CMD_EXIT_FORCE:
             for i in range(4, 0, -1):
                 print(
                     f"{C.yellow}[info] Executes in {i}s  ",

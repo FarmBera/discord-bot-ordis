@@ -52,6 +52,6 @@ async def add_job(job_type: JobType, data: dict) -> None:
     GLOBAL_QUEUE.append({"type": job_type, "data": data})
 
 
-def get_queue_status() -> str:
+def get_queue_status() -> int:
     global GLOBAL_QUEUE
-    return str(len(GLOBAL_QUEUE))
+    return len(GLOBAL_QUEUE)
