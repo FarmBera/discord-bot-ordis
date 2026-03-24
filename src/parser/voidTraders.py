@@ -10,7 +10,6 @@ from src.utils.return_err import err_embed
 from src.utils.times import timeNow, convert_remain
 
 baro_img = ["baro-ki-teer", "baro"]  # VAR
-baro_active: bool = False
 pf: str = "cmd.void-traders."
 pfi = "cmd.void-traders-item."
 
@@ -28,7 +27,7 @@ def getBaroImg(name: str = "") -> str:
     return baro_img[random.randrange(0, len(baro_img))]
 
 
-def isBaroActive(act, exp) -> bool:
+def isBaroActive(act: int, exp: int) -> bool:
     curr: int = timeNow()
 
     t_list = [act, exp]
@@ -45,10 +44,8 @@ def isBaroActive(act, exp) -> bool:
     return True if active < curr < expiry else False
 
 
-def color_decision():
-    global baro_active
-
-    if baro_active:
+def color_decision(active_flag):
+    if active_flag:
         return 0x4DD2FF
     return 0xFFA826
 
@@ -60,56 +57,48 @@ def w_voidTraders(
     ts: Translator = _ts,
     lang: str = _default_lang,
 ) -> tuple:
-    global baro_active
+    active_flag: bool = False
 
     if not trader:
         return "", err_embed(ts.get("err.void-traders-not-found"))
 
     idx = 1
     length: int = len(trader)
-
-    output_msg: str = f"# {text_arg if text_arg else ts.get(f'{pf}title')}\n\n"
+    output_msg: str = ""
 
     for td in trader:
         t_act: int = int(td["Activation"]["$date"]["$numberLong"])
         t_exp: int = int(td["Expiry"]["$date"]["$numberLong"])
-
-        if length >= 2:
-            output_msg += (
-                f"{idx}. {ts.get(f'{pf}tdr-name')}: {ts.trs(td['Character'])}\n\n"
-            )
-            idx += 1
-        else:
-            output_msg += f"- {ts.get(f'{pf}tdr-name')}: {ts.trs(td['Character'])}\n"
-
         baro_active = isBaroActive(t_act, t_exp)
 
-        # OO appeared
         if baro_active:
-            output_msg += (
-                f"- {ts.get(f'{pf}status')}: ✅ **{ts.get(f'{pf}activate')}**\n"
-            )
-            output_msg += f"- {ts.get(f'{pf}end').format(time=convert_remain(t_exp))}\n"
-            output_msg += f"- {ts.get(f'{pf}location')}: "
-        # XX NOT appeared
-        else:
-            output_msg += (
-                f"- {ts.get(f'{pf}status')}: ❌ *{ts.get(f'{pf}deactivate')}*\n"
-            )
-            output_msg += (
-                f"- {ts.get(f'{pf}appear').format(time=convert_remain(t_act))}\n"
-            )
-            output_msg += f"- {ts.get(f'{pf}place')}: "
+            active_flag = True
 
-        # appear location
-        output_msg += f"**{getSolNode(td['Node'], lang)}**\n"
+        # title
+        output_msg += "# {idx}{msg}\n".format(
+            idx=f"{idx}. " if length >= 2 else "",
+            msg=text_arg if text_arg else ts.get(f"{pf}title"),
+        )
+        # body
+        output_msg += ts.get(f"{pf}embed-body").format(
+            trader=ts.trs(td["Character"]),
+            status=(
+                f"✅ **{ts.get(f'{pf}activate')}**"
+                if baro_active
+                else f"❌ *{ts.get(f'{pf}deactivate')}*"
+            ),
+            time=ts.get(f"{pf}time-format").format(
+                text=ts.get(f"{pf}leave") if baro_active else ts.get(f"{pf}appear"),
+                time=convert_remain(t_exp) if baro_active else convert_remain(t_act),
+            ),
+            location=getSolNode(td["Node"], lang),
+        )
 
     embed = discord.Embed(
-        description=output_msg,
-        color=embed_color if embed_color else color_decision(),
+        description=output_msg.strip(),
+        color=embed_color if embed_color else color_decision(active_flag),
     )
     embed.set_thumbnail(url="attachment://i.webp")
-
     return embed, getBaroImg(trader[0]["Character"])
 
 
@@ -119,6 +108,7 @@ def w_voidTradersItem(
     if not trader:
         return err_embed(ts.get("err.void-traders-not-found"))
 
+    active_flag_item: bool = False
     output_msg: str = ""
 
     for td in trader:
@@ -128,6 +118,9 @@ def w_voidTradersItem(
             list_item.append(
                 f"{ts.get(f'{pfi}not-yet').format(time=convert_remain(td['Activation']['$date']['$numberLong']))}"
             )
+        else:
+            active_flag_item = True
+
         for jtem in td.get("Manifest", []):
             k: str = jtem["ItemType"].replace("/Lotus/StoreItems", "").lower()
 
@@ -169,7 +162,7 @@ def w_voidTradersItem(
         output_msg += "\n"
 
     return discord.Embed(
-        description=check_str_length(output_msg), color=color_decision()
+        description=check_str_length(output_msg), color=color_decision(active_flag_item)
     )
 
 

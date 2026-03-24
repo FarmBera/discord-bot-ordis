@@ -185,40 +185,44 @@ cmd:
 
   void-traders:
     cmd: 바로키티어
-    desc: 현재 바로 키 티어 상태를 알 수 있어요. (등장 여부, 언제, 어디서 등장할지)
-    title: 바로 키 티어 현황
+    desc: 현재 바로 키티어 상태를 알 수 있어요. (등장 여부, 언제, 어디서 등장할지)
+    title: 바로 키티어 현황
 
     # msg title
-    baro-new: 바로 키 티어 등장 예정 # New Baro scheduled
-    baro-appear: 바로 키 티어가 등장했습니다! # Baro Appeared!
+    baro-new: 바로 키티어 등장 예정 # New Baro scheduled
+    baro-appear: 바로 키티어가 등장했습니다! # Baro Appeared!
 
-    # embed msg
-    tdr-name: 상인
-    status: 상태
+    # embed body message
+    embed-body: |
+      - 상인: **{trader}**
+      - 상태: {status}
+      - {time}
+      - 위치: **{location}**
 
+    # status
     activate: "[활성화](https://wiki.warframe.com/w/Baro_Ki%27Teer)"
-    end: 상인이 **{time}** 떠납니다.
-    location: 등장 위치
-
     deactivate: 비활성화
-    appear: "**{time}** 등장 예정입니다."
-    place: 등장 예정 위치
+    # time_prefix
+    leave: 상인이 떠남
+    appear: 등장 예정
+    time-format: "**{time}** {text}"
 
+    # random message
     msg:
       - 기다림은 끝났습니다, 텐노. 제가 도착했습니다.
       - 텐노! 당신께 초대장을 드리고자 합니다. 보이드에서 가져와 엄선한 저의 최신 컬렉션을 감상해보세요.
       - 당신께 보여드릴 상품이 아주 많답니다.
-      - 바로 키티어가 성심성의껏 모시겠습니다.
-      - 오 이런, 훌륭한 안목을 지닌 분이 오셨군요.
+#      - 바로 키티어가 성심성의껏 모시겠습니다.
+#      - 오 이런, 훌륭한 안목을 지닌 분이 오셨군요.
       - 오늘 제가 보여드릴 상품은 인정하실 수밖에 없을 겁니다만?
 
   void-traders-item:
     cmd: 바로키티어-물품
-    desc: 바로 키 티어가 판매하는 물품 목록을 확인할 수 있어요.
+    desc: 바로 키티어가 판매하는 물품 목록을 확인할 수 있어요.
 
     not-yet: |
-      바로 키 티어가 **아직 도착하지 않았습니다**!
-      - **{time}** 도착 예정 입니다.
+      바로 키티어가 **아직 도착하지 않았습니다**!
+      - **{time}** 도착 예정
 
     mods: 모드
     skin: 스킨
@@ -857,6 +861,7 @@ cmd:
     err-save: "동의 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
 
 trs:
+  "Baro'Ki Teel": 바로 키티어
   # keyword
   blueprint: 설계도
 

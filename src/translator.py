@@ -45,13 +45,15 @@ class Translator:
         if self.lang == self.EN:
             return key
 
-        value = self.translations
-        try:
-            for k in ["trs", key.lower()]:
-                value = value[k]
-            return value
-        except (KeyError, TypeError):
+        trs_dict = self.translations.get("trs")
+        if not trs_dict:
             return key
+
+        lower_key = key.lower()
+        for k, v in trs_dict.items():
+            if k.lower() == lower_key:
+                return v
+        return key
 
 
 # initialize language

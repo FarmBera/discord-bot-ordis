@@ -190,20 +190,24 @@ cmd:
 
     # msg title
     baro-new: New Baro Scheduled
-    baro-appear: Baro Appeared!
+    baro-appear: Baro Ki'Teer Appeared!
 
-    # embed msg
-    tdr-name: Trader
-    status: Status
+    # embed body message
+    embed-body: |
+      - Trader: **{trader}**
+      - Status: {status}
+      - {time}
+      - Location: **{location}**
 
+    # status
     activate: "[Activated](https://wiki.warframe.com/w/Baro_Ki%27Teer)"
-    end: "Trader will leave {time}"
-    location: Location
-
     deactivate: Deactivated
-    appear: "Appears {time}"
-    place: Coming to
+    # time_prefix
+    leave: Leaves
+    appear: Appear
+    time-format: "{text} **{time}**"
 
+    # random message
     msg:
       - The wait is over Tenno, Baro Ki'Teer has arrived.
       - Tenno! May I extend an invitation to you, my latest collection of choice items from the Void is now available for viewing.
