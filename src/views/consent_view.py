@@ -154,4 +154,11 @@ async def check_consent(
         await interact.followup.send(embed=embed, view=view, ephemeral=True)
     else:
         await interact.response.send_message(embed=embed, view=view, ephemeral=True)
+    await save_log(
+        pool=interact.client.db,
+        type=LOG_TYPE.info,
+        cmd="first-use",
+        interact=interact,
+        msg="Used bot for the first time!",
+    )
     return False
