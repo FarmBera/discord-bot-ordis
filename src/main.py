@@ -4,6 +4,7 @@ import sys
 
 import aiomysql
 import discord
+from discord.ext.commands import errors as DECerror
 
 from config.TOKEN import (
     TOKEN as BOT_TOKEN,
@@ -95,6 +96,16 @@ async def main_manager() -> None:
         if bot_mode == CMD_MAIN:
             print(f"{C.cyan}[info] Starting Main Bot...{C.default}")  # VAR
             current_bot = DiscordBot(intents=intents, db=db_pool)
+
+            @current_bot.event
+            async def on_command_error(ctx, error):
+                if isinstance(error, DECerror.CommandNotFound):
+                    return
+                msg = f"Unhandled command error (not app command): {error}"
+                await save_log(
+                    pool=db_pool, type=LOG_TYPE.err, msg=msg, obj=return_traceback()
+                )
+                print_test_err() if DEBUG_MODE else print(msg)
 
             @current_bot.tree.error
             async def on_app_command_error(
