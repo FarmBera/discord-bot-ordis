@@ -837,28 +837,26 @@ cmd:
     output: "\n- **{value}**: {desc}"
 
   consent:
-    # Step 1: Terms notice
     notice: |
       # 📋 Terms of Service Agreement
-      You must agree to the Terms of Service and Privacy Policy before using the Ordis bot.
-      Please review each document and click **Agree** to proceed.
+      To use the 'Ordis' Bot, you must review the Terms of Service and Privacy Policy and agree to them.
+      After reviewing each document, please click the **Agree** button if you agree.
+      If you do not agree, you will not be able to use the features provided by the bot.
+
       ## [📄 Terms of Service]({HOMEPAGE}/tos)
       ## [🔒 Privacy Policy]({HOMEPAGE}/privacy)
+      [⚖ Copyright and Legal Notice]({HOMEPAGE}/legal)
+
+      I have fully understood the contents of the **Terms of Service** and **Privacy Policy** and agree to them.
     version: "Terms version: v{ver}"
     btn-agree: "Agree"
     btn-disagree: "Decline"
 
-    # Step 2: Final confirmation
-    confirm-notice: |
-      # ⚠️ Final Confirmation
-      I have fully read and understood the **Terms of Service** and **Privacy Policy**, and I agree to them.
-    btn-confirm: "I Agree"
-    btn-cancel: "Cancel"
-
-    # Result messages
     agreed: "✅ You have agreed to the Terms of Service. You can now freely use the bot!"
     cancelled: "❌ Terms of Service agreement has been cancelled. Agreement is required to use bot features."
 
-    # Errors
     err-not-owner: "Only the original user can proceed with this agreement."
-    err-save: "An error occurred while saving your agreement. Please try again later."
+    err-save: |
+      ❌ An error occurred while saving your agreement. Please try again later.
+
+      If the problem persists, please contact the staff member with the username '고양이 (Cat)'
