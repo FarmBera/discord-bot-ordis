@@ -131,132 +131,174 @@ async def build_party_embed_from_db(message_id: int, pool, isDelete: bool = Fals
 
 
 # ----------------- Modals -----------------
-class PartyEditModal(ui.Modal, title=ts.get(f"{pf}edit-title")):
-    def __init__(self, current_title, current_mission, current_desc):
+class PartyEditAllModal(ui.Modal, title=ts.get(f"{pf}edit-all-title")):
+    def __init__(self, party_data: dict, participants: list):
         super().__init__(timeout=None)
+
+        self.current_title = party_data["title"] or ""
+        self.current_mission = party_data["game_name"] or ""
+        self.current_desc = party_data["description"] or ""
+        self.current_max_users = int(party_data["max_users"])
+        self.participants_count = len(participants)
+
         self.title_input = ui.TextInput(
-            label=ts.get(f"{pf}edit-title-input"), default=current_title, required=True
-        )
-        self.mission_input = ui.TextInput(
-            label=ts.get(f"{pf}edit-mission-input"),
-            default=current_mission,
+            label=ts.get(f"{pf}edit-title-input"),
+            default=self.current_title,
             required=True,
         )
-        self.desc_input = ui.TextInput(
-            label=ts.get(f"{pf}edit-desc-input"),
-            style=discord.TextStyle.long,
-            default=current_desc,
-            required=False,
-        )
         self.add_item(self.title_input)
+
+        self.mission_input = ui.TextInput(
+            label=ts.get(f"{pf}edit-mission-input"),
+            default=self.current_mission,
+            required=True,
+        )
         self.add_item(self.mission_input)
-        self.add_item(self.desc_input)
 
-    async def on_submit(self, interact: discord.Interaction):
-        try:
-            await PartyService.update_party_content(
-                interact.client.db,
-                interact.message.id,
-                self.title_input.value,
-                self.mission_input.value,
-                self.desc_input.value,
-            )
-            await add_job(JobType.PARTY_UPDATE, {"interact": interact, "self": self})
-            await interact.client.trigger_queue_processing()
-            await interact.response.send_message(
-                ts.get(f"{pf}edit-requested"), ephemeral=True
-            )
-        except Exception:
-            await interact.response.send_message(
-                ts.get(f"{pf}edit-err"), view=SupportView(), ephemeral=True
-            )
-            await save_log(
-                pool=interact.client.db,
-                type=LOG_TYPE.err,
-                cmd="btn.edit.article",
-                interact=interact,
-                msg=f"PartyEditModal -> Clicked Submit",
-                obj=f"T:{self.title_input.value}\nTYP:{self.mission_input.value}\nDESC:{self.desc_input.value}\n{return_traceback()}",
-            )
-
-
-class PartySizeModal(ui.Modal, title=ts.get(f"{pf}size-ui-title")):
-    def __init__(self, current_max):
-        super().__init__(timeout=None)
         self.size_input = ui.TextInput(
-            label=ts.get(f"{pf}size-label"), default=str(current_max), required=True
+            label=ts.get(f"{pf}size-label"),
+            default=str(self.current_max_users),
+            required=True,
         )
         self.add_item(self.size_input)
 
-    async def on_submit(self, interact: discord.Interaction):
-        await save_log(
-            pool=interact.client.db,
-            type=LOG_TYPE.event,
-            cmd="btn.edit.partysize",
-            interact=interact,
-            msg=f"PartySizeModal -> Clicked Submit",
-            obj=self.size_input.value,
-        )
-
-        if not self.size_input.value.isdigit():
-            await interact.response.send_message(
-                ts.get(f"{pf}size-err-low").format(min=MIN_SIZE, max=MAX_SIZE),
-                ephemeral=True,
-            )
-            return
-        new_size = int(self.size_input.value)
-
-        # Validation Logic (Host logic should ideally be in service, but View can handle validation for speed)
-        if new_size < MIN_SIZE or new_size > MAX_SIZE:
-            await interact.response.send_message(
-                ts.get(f"{pf}size-err-high").format(max=MAX_SIZE), ephemeral=True
-            )
-            return
-
-        party, participants = await PartyService.get_party_by_message_id(
-            interact.client.db, interact.message.id
-        )
-        if len(participants) > new_size:
-            await interact.response.send_message(
-                ts.get(f"{pf}size-err-high-1").format(size=len(participants)),
-                ephemeral=True,
-            )
-            return
-
-        await PartyService.update_party_size(
-            interact.client.db, interact.message.id, new_size
-        )
-        await add_job(JobType.PARTY_UPDATE, {"interact": interact})
-        await interact.response.send_message(
-            ts.get(f"{pf}edit-requested"), ephemeral=True
-        )
-
-
-class PartyDateEditModal(ui.Modal, title=ts.get(f"{pf}date-title")):
-    def __init__(self):
-        super().__init__(timeout=None)
         self.date_input = ui.TextInput(
-            label=ts.get(f"{pf}date-input"), placeholder=ts.get(f"{pf}date-placeholder")
+            label=ts.get(f"{pf}date-input"),
+            placeholder=ts.get(f"{pf}date-placeholder"),
+            default="",  # blank = keep existing departure
+            required=False,
         )
         self.add_item(self.date_input)
 
-    async def on_submit(self, interact: discord.Interaction):
-        await save_log(
-            pool=interact.client.db,
-            type=LOG_TYPE.event,
-            cmd="btn.edit.date",
-            interact=interact,
-            msg=f"PartyDateEditModal -> Clicked Submit",
-            obj=f"{self.date_input.value}",
+        self.desc_input = ui.TextInput(
+            label=ts.get(f"{pf}edit-desc-input"),
+            style=discord.TextStyle.long,
+            default=self.current_desc,
+            required=False,
         )
+        self.add_item(self.desc_input)
+
+    async def on_submit(self, interact: discord.Interaction):
+        # Validate all fields together, collect errors
+        errors: list[str] = []
+
+        new_title: str | None = None
+        new_mission: str | None = None
+        new_description: str | None = None
+        new_max_users: int | None = None
+        new_departure = None
+
+        # title
+        title_val = self.title_input.value.strip()
+        if not title_val:
+            errors.append(
+                f"- {ts.get(f'{pf}edit-title-input')}: "
+                f"{ts.get(f'{pf}edit-err-empty')}"
+            )
+        else:
+            new_title = title_val
+
+        # mission
+        mission_val = self.mission_input.value.strip()
+        if not mission_val:
+            errors.append(
+                f"- {ts.get(f'{pf}edit-mission-input')}: "
+                f"{ts.get(f'{pf}edit-err-empty')}"
+            )
+        else:
+            new_mission = mission_val
+
+        new_description = self.desc_input.value
+
+        # max participants
+        size_str = self.size_input.value.strip()
+        if not size_str.isdigit():
+            errors.append(
+                f"- {ts.get(f'{pf}size-label')}: "
+                f"{ts.get(f'{pf}size-err-low').format(min=MIN_SIZE, max=MAX_SIZE)}"
+            )
+        else:
+            parsed_size = int(size_str)
+            if parsed_size < MIN_SIZE or parsed_size > MAX_SIZE:
+                errors.append(
+                    f"- {ts.get(f'{pf}size-label')}: "
+                    f"{ts.get(f'{pf}size-err-high').format(max=MAX_SIZE)}"
+                )
+            elif parsed_size < self.participants_count:
+                errors.append(
+                    f"- {ts.get(f'{pf}size-label')}: "
+                    f"{ts.get(f'{pf}size-err-high-1').format(size=self.participants_count)}"
+                )
+            else:
+                new_max_users = parsed_size
+
+        # departure
+        date_val = self.date_input.value.strip()
+        if date_val:
+            try:
+                parsed_dt = parseKoreanDatetime(date_val)
+            except Exception:
+                parsed_dt = None
+            if parsed_dt is None:
+                errors.append(
+                    f"- {ts.get(f'{pf}date-input')}: "
+                    f"{ts.get(f'{pf}date-err-parse')}"
+                )
+            else:
+                new_departure = parsed_dt
+
+        if errors:
+            await interact.response.send_message("\n".join(errors), ephemeral=True)
+            return
+
+        diff_kwargs: dict = {}
+        change_log: list[str] = []
+
+        if new_title is not None and new_title != self.current_title:
+            diff_kwargs["title"] = new_title
+            change_log.append("title")
+        if new_mission is not None and new_mission != self.current_mission:
+            diff_kwargs["mission"] = new_mission
+            change_log.append("mission")
+        if new_description != self.current_desc:
+            diff_kwargs["description"] = new_description
+            change_log.append("desc")
+        if new_max_users is not None and new_max_users != self.current_max_users:
+            diff_kwargs["max_users"] = new_max_users
+            change_log.append(f"size:{self.current_max_users}->{new_max_users}")
+        if new_departure is not None:
+            # Departure comparison: only send if user actually typed a value;
+            diff_kwargs["departure"] = new_departure
+            change_log.append(f"departure:{date_val}")
+
+        if not diff_kwargs:
+            await interact.response.send_message(
+                ts.get(f"{pf}edit-no-change"), ephemeral=True
+            )
+            await save_log(
+                pool=interact.client.db,
+                type=LOG_TYPE.event,
+                cmd="btn.edit.party",
+                interact=interact,
+                msg="PartyEditAllModal -> Submit, no change",
+            )
+            return
+
         try:
-            await PartyService.update_party_departure(
-                interact.client.db, interact.message.id, self.date_input.value
+            await PartyService.update_party_info(
+                interact.client.db, interact.message.id, **diff_kwargs
             )
             await add_job(JobType.PARTY_UPDATE, {"interact": interact, "self": self})
             await interact.client.trigger_queue_processing()
             await interact.response.send_message(
                 ts.get(f"{pf}edit-requested"), ephemeral=True
+            )
+            await save_log(
+                pool=interact.client.db,
+                type=LOG_TYPE.event,
+                cmd="btn.edit.party",
+                interact=interact,
+                msg=f"PartyEditAllModal -> Submit {', '.join(change_log)}",
             )
         except Exception:
             if not interact.response.is_done():
@@ -266,10 +308,14 @@ class PartyDateEditModal(ui.Modal, title=ts.get(f"{pf}date-title")):
             await save_log(
                 pool=interact.client.db,
                 type=LOG_TYPE.err,
-                cmd="btn.edit-date",
+                cmd="btn.edit.party",
                 interact=interact,
-                msg=f"PartyDateEditModal -> Clicked Submit, but ERR",
-                obj=f"{self.date_input.value}\n{return_traceback()}",
+                msg="PartyEditAllModal -> Submit, but ERR",
+                obj=(
+                    f"T:{title_val}\nM:{mission_val}\nSIZE:{size_str}\n"
+                    f"DATE:{date_val}\nDESC:{self.desc_input.value}\n"
+                    f"{return_traceback()}"
+                ),
             )
 
 
@@ -623,6 +669,7 @@ class PartyView(ui.View):
         label=ts.get(f"{pf}pv-join-btn"),
         style=discord.ButtonStyle.success,
         custom_id="party_join",
+        row=1,
     )
     async def join_party(self, interact: discord.Interaction, button: ui.Button):
         cmd = "PartyView.btn.join"
@@ -669,6 +716,7 @@ class PartyView(ui.View):
         label=ts.get(f"{pf}pv-leave-btn"),
         style=discord.ButtonStyle.danger,
         custom_id="party_leave",
+        row=1,
     )
     async def leave_party(self, interact: discord.Interaction, button: ui.Button):
         cmd = "PartyView.btn.leave"
@@ -698,18 +746,19 @@ class PartyView(ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-mod-label"),
+        label=ts.get(f"{pf}pv-mod-all"),
         style=discord.ButtonStyle.secondary,
-        custom_id="party_edit_size",
+        custom_id="party_edit_info",
+        row=1,
     )
-    async def edit_size(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "PartyView.btn.edit-size"
+    async def edit_info(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "PartyView.btn.edit-info"
         await save_log(
             pool=interact.client.db,
             type=LOG_TYPE.event,
             cmd=cmd,
             interact=interact,
-            msg=f"PartyView -> edit_size",
+            msg=f"PartyView -> edit_info",
         )
         check_result = await self.check_permissions(
             interact, self.cooldown_manage, check_host=True, cmd=cmd
@@ -719,64 +768,13 @@ class PartyView(ui.View):
 
         party, participants = check_result
 
-        await interact.response.send_modal(PartySizeModal(party["max_users"]))
-
-    @ui.button(
-        label=ts.get(f"{pf}pv-mod-article"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="party_edit_content",
-    )
-    async def edit_content(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "PartyView.btn.edit-content"
-        await save_log(
-            pool=interact.client.db,
-            type=LOG_TYPE.event,
-            cmd=cmd,
-            interact=interact,
-            msg=f"PartyView -> edit_content",
-        )
-        check_result = await self.check_permissions(
-            interact, self.cooldown_manage, check_host=True, cmd=cmd
-        )
-        if not check_result:
-            return
-
-        party, participants = check_result
-
-        await interact.response.send_modal(
-            PartyEditModal(
-                party["title"],
-                party["game_name"],
-                party["description"],
-            )
-        )
-
-    @ui.button(
-        label=ts.get(f"{pf}date-btn"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="party_edit_departure",
-    )
-    async def edit_departure(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "PartyView.btn.edit-departure"
-        await save_log(
-            pool=interact.client.db,
-            type=LOG_TYPE.event,
-            cmd=cmd,
-            interact=interact,
-            msg=f"PartyView -> edit_departure",
-        )
-        check_result = await self.check_permissions(
-            interact, self.cooldown_manage, check_host=True, cmd=cmd
-        )
-        if not check_result:
-            return
-
-        await interact.response.send_modal(PartyDateEditModal())
+        await interact.response.send_modal(PartyEditAllModal(party, participants))
 
     @ui.button(
         label=ts.get(f"{pf}pv-done"),
         style=discord.ButtonStyle.primary,
         custom_id="party_toggle_close",
+        row=2,
     )
     async def toggle_close(self, interact: discord.Interaction, button: ui.Button):
         cmd = "PartyView.btn.togle-close"
@@ -806,7 +804,7 @@ class PartyView(ui.View):
         )
         # Disable/Enable other buttons
         for child in self.children:
-            if child.custom_id in ["party_join", "party_edit_size"]:
+            if child.custom_id in ["party_join"]:
                 child.disabled = is_done
 
         await add_job(JobType.PARTY_TOGGLE, {"interact": interact, "view": self})
@@ -820,6 +818,7 @@ class PartyView(ui.View):
         label=ts.get(f"{pf}pv-call-label"),
         style=discord.ButtonStyle.secondary,
         custom_id="party_call_members",
+        row=2,
     )
     async def call_members(self, interact: discord.Interaction, button: ui.Button):
         cmd = "PartyView.btn.member-call"
@@ -855,6 +854,7 @@ class PartyView(ui.View):
         label=ts.get(f"{pf}pv-kick-label"),
         style=discord.ButtonStyle.secondary,
         custom_id="party_kick_member",
+        row=2,
     )
     async def kick_member(self, interact: discord.Interaction, button: ui.Button):
         cmd = "PartyView.btn.member-kick"
@@ -890,6 +890,7 @@ class PartyView(ui.View):
         label=ts.get(f"{pf}pv-del-label"),
         style=discord.ButtonStyle.danger,
         custom_id="party_delete",
+        row=2,
     )
     async def delete_party(self, interact: discord.Interaction, button: ui.Button):
         cmd = "PartyView.btn.delete-party"

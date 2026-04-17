@@ -1,12 +1,13 @@
 import discord
 
 from config.config import LOG_TYPE
+from src.constants.color import C
 from src.translator import ts
 from src.utils.db_helper import transaction, query_reader
 from src.utils.delay import delay
 from src.utils.logging_utils import save_log
 from src.utils.times import parseKoreanDatetime
-from src.utils.webhook import get_webhook
+from src.utils.webhook import webhook_send, webhook_edit
 
 pf = "cmd.party."
 
@@ -22,7 +23,7 @@ class PartyService:
             if not party:
                 return None, None
 
-            # searc participants
+            # search participants
             await cursor.execute(
                 "SELECT * FROM participants WHERE party_id = %s", (party["id"],)
             )
@@ -44,7 +45,7 @@ class PartyService:
         departure_dt = parseKoreanDatetime(departure_str) if departure_str else None
 
         async with transaction(pool) as cursor:
-            # 1. insert party info
+            # insert party info
             await cursor.execute(
                 "INSERT INTO party (host_id, title, game_name, departure, max_users, status, description) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 (
@@ -75,30 +76,49 @@ class PartyService:
             )
 
     @staticmethod
-    async def update_party_content(pool, message_id, title, mission, desc):
-        async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE party SET title = %s, game_name = %s, description = %s WHERE message_id = %s",
-                (title, mission, desc, message_id),
-            )
+    async def update_party_info(
+        pool,
+        message_id: int,
+        *,
+        title: str | None = None,
+        mission: str | None = None,
+        description: str | None = None,
+        max_users: int | None = None,
+        departure=None,
+    ) -> bool:
+        """Update any subset of {title, mission, description, max_users, departure}
+        in a single query. Fields passed as None are left untouched.
 
-    @staticmethod
-    async def update_party_size(pool, message_id, new_size: int):
-        async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE party SET max_users = %s WHERE message_id = %s",
-                (new_size, message_id),
-            )
+        Returns True if at least one column was included in the UPDATE.
+        """
+        updates: list[str] = []
+        params: list = []
 
-    @staticmethod
-    async def update_party_departure(pool, message_id, date_str):
-        conv_date = parseKoreanDatetime(date_str)
+        if title is not None:
+            updates.append("title = %s")
+            params.append(title)
+        if mission is not None:
+            updates.append("game_name = %s")
+            params.append(mission)
+        if description is not None:
+            updates.append("description = %s")
+            params.append(description)
+        if max_users is not None:
+            updates.append("max_users = %s")
+            params.append(max_users)
+        if departure is not None:
+            updates.append("departure = %s")
+            params.append(departure)
+
+        if not updates:
+            return False
+
+        params.append(message_id)
+        sql = f"UPDATE party SET {', '.join(updates)} WHERE message_id = %s"
+
         async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE party SET departure = %s WHERE message_id = %s",
-                (conv_date, message_id),
-            )
-        return conv_date
+            await cursor.execute(sql, tuple(params))
+        return True
 
     @staticmethod
     async def toggle_status(pool, party_id, current_status):
@@ -159,13 +179,13 @@ class PartyService:
 
         interact = job_data["interact"]
         party_data = job_data["data"]
-        webhook = await get_webhook(
-            job_data["target_channel"], interact.client.user.avatar
-        )
-        await delay()
+        target_channel = job_data["target_channel"]
+        avatar = interact.client.user.avatar
 
-        thread_starter_msg = await webhook.send(
-            content=party_data["title"],  # ts.get(f"{pf}created-party"),
+        thread_starter_msg = await webhook_send(
+            target_channel,
+            avatar,
+            content=party_data["title"],
             username=interact.user.display_name,
             avatar_url=interact.user.display_avatar.url,
             wait=True,
@@ -217,22 +237,36 @@ class PartyService:
 
         # edit thread start message
         modal = job_data.get("self")
-        if modal:
+        if modal is not None:
             try:
-                ch_name = f"[{modal.mission_input.value}] {modal.title_input.value}"
-                if (
-                    isinstance(interact.channel, discord.Thread)
-                    and interact.channel.name != ch_name
-                ):
-                    await interact.channel.edit(name=ch_name)
-            except:
+                title_val = getattr(modal, "title_input", None)
+                mission_val = getattr(modal, "mission_input", None)
+                if title_val is not None and mission_val is not None:
+                    ch_name = f"[{mission_val.value}] {title_val.value}"
+                    if (
+                        isinstance(interact.channel, discord.Thread)
+                        and interact.channel.name != ch_name
+                    ):
+                        await interact.channel.edit(name=ch_name)
+            except Exception:
                 pass
 
         # logging
-        try:
-            modal_log = f"{modal.title_input.value}\n{modal.mission_input.value}\n{modal.desc_input.value}"
-        except:
-            modal_log = f"{modal.date_input.value}"
+        modal_log = "<no modal context>"
+        if modal is not None:
+            parts: list[str] = []
+            for attr in (
+                "title_input",
+                "mission_input",
+                "desc_input",
+                "size_input",
+                "date_input",
+            ):
+                field = getattr(modal, attr, None)
+                if field is not None:
+                    parts.append(f"{attr}={field.value}")
+            if parts:
+                modal_log = "\n".join(parts)
         await save_log(
             pool=db,
             type=LOG_TYPE.info,
@@ -251,20 +285,23 @@ class PartyService:
         await msg.edit(embed=new_embed, view=None)
         await delay()
 
-        # edit thread starter msg
-        try:
-            webhook = await get_webhook(
-                interact.channel.parent, interact.client.user.avatar
-            )
-            if webhook:
-                await webhook.edit_message(
-                    message_id=interact.channel.id, content=ts.get(f"{pf}del-deleted")
-                )
-        except:
-            pass  # starter msg not found (maybe deleted manually)
-        await delay()
+        parent_channel = interact.channel.parent
+        avatar = interact.client.user.avatar
 
-        # lock thread
+        result = await webhook_edit(
+            parent_channel,
+            avatar,
+            message_id=interact.channel.id,
+            content=ts.get(f"{pf}del-deleted"),
+        )
+        if not result:
+            print(
+                C.red,
+                "starter message not found! from party_service > execute_delete()",
+                C.default,
+                sep="",
+            )
+
         if isinstance(interact.channel, discord.Thread):
             await interact.channel.edit(locked=True)
 

@@ -7,7 +7,7 @@ from src.utils.api_request import API_MarketSearch
 from src.utils.db_helper import transaction, query_reader
 from src.utils.delay import delay
 from src.utils.logging_utils import save_log
-from src.utils.webhook import get_webhook
+from src.utils.webhook import webhook_send, webhook_edit
 
 pf = "cmd.trade."
 
@@ -63,28 +63,41 @@ class TradeService:
             )
 
     @staticmethod
-    async def update_quantity(pool, message_id, new_quantity):
-        async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE trade SET quantity = %s WHERE message_id = %s",
-                (new_quantity, message_id),
-            )
+    async def update_trade_info(
+        pool,
+        message_id: int,
+        *,
+        quantity: int | None = None,
+        price: int | None = None,
+        item_rank: int | None = None,
+    ) -> bool:
+        """Update quantity / price / item_rank in a single query.
 
-    @staticmethod
-    async def update_price(pool, message_id, new_price):
-        async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE trade SET price = %s WHERE message_id = %s",
-                (new_price, message_id),
-            )
+        Fields passed as None are left untouched. Returns True if at least
+        one column was included in the UPDATE, False otherwise (no-op).
+        """
+        updates: list[str] = []
+        params: list = []
 
-    @staticmethod
-    async def update_item_rank(pool, message_id, new_rank):
+        if quantity is not None:
+            updates.append("quantity = %s")
+            params.append(quantity)
+        if price is not None:
+            updates.append("price = %s")
+            params.append(price)
+        if item_rank is not None:
+            updates.append("item_rank = %s")
+            params.append(item_rank)
+
+        if not updates:
+            return False
+
+        params.append(message_id)
+        sql = f"UPDATE trade SET {', '.join(updates)} WHERE message_id = %s"
+
         async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE trade SET item_rank = %s WHERE message_id = %s",
-                (new_rank, message_id),
-            )
+            await cursor.execute(sql, tuple(params))
+        return True
 
     @staticmethod
     async def delete_trade(pool, thread_id):
@@ -128,11 +141,8 @@ class TradeService:
 
         interact = job_data["interact"]
         data = job_data["data"]
-
-        webhook = await get_webhook(
-            job_data["target_channel"], interact.client.user.avatar
-        )
-        await delay()
+        target_channel = job_data["target_channel"]
+        avatar = interact.client.user.avatar
 
         thread_name = f"[{data['trade_type']}] {data['item_name']}"
         if data.get("isRank") and data["item_rank"] != -1:
@@ -140,7 +150,9 @@ class TradeService:
                 f" ({ts.get(f'{pf}rank-simple').format(rank=data['item_rank'])})"
             )
 
-        thread_starter_msg = await webhook.send(
+        thread_starter_msg = await webhook_send(
+            target_channel,
+            avatar,
             content=f"**{data['trade_type']}** 합니다.",
             username=interact.user.display_name,
             avatar_url=interact.user.display_avatar.url,
@@ -186,17 +198,15 @@ class TradeService:
         await msg.edit(embed=new_embed, view=None)
         await delay()
 
-        # edit thread starter msg
-        try:
-            webhook = await get_webhook(
-                interact.channel.parent, interact.client.user.avatar
-            )
-            if webhook:
-                await webhook.edit_message(
-                    message_id=interact.channel.id, content=ts.get(f"{pf}deleted")
-                )
-        except:
-            pass  # starter msg not found (maybe deleted manually)
+        parent_channel = interact.channel.parent
+        avatar = interact.client.user.avatar
+
+        await webhook_edit(
+            parent_channel,
+            avatar,
+            message_id=interact.channel.id,
+            content=ts.get(f"{pf}deleted"),
+        )
         await delay()
 
         # lock thread
