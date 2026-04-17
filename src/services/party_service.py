@@ -1,12 +1,13 @@
 import discord
 
 from config.config import LOG_TYPE
+from src.constants.color import C
 from src.translator import ts
 from src.utils.db_helper import transaction, query_reader
 from src.utils.delay import delay
 from src.utils.logging_utils import save_log
 from src.utils.times import parseKoreanDatetime
-from src.utils.webhook import get_webhook
+from src.utils.webhook import webhook_send, webhook_edit
 
 pf = "cmd.party."
 
@@ -22,7 +23,7 @@ class PartyService:
             if not party:
                 return None, None
 
-            # searc participants
+            # search participants
             await cursor.execute(
                 "SELECT * FROM participants WHERE party_id = %s", (party["id"],)
             )
@@ -44,7 +45,7 @@ class PartyService:
         departure_dt = parseKoreanDatetime(departure_str) if departure_str else None
 
         async with transaction(pool) as cursor:
-            # 1. insert party info
+            # insert party info
             await cursor.execute(
                 "INSERT INTO party (host_id, title, game_name, departure, max_users, status, description) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 (
@@ -159,13 +160,13 @@ class PartyService:
 
         interact = job_data["interact"]
         party_data = job_data["data"]
-        webhook = await get_webhook(
-            job_data["target_channel"], interact.client.user.avatar
-        )
-        await delay()
+        target_channel = job_data["target_channel"]
+        avatar = interact.client.user.avatar
 
-        thread_starter_msg = await webhook.send(
-            content=party_data["title"],  # ts.get(f"{pf}created-party"),
+        thread_starter_msg = await webhook_send(
+            target_channel,
+            avatar,
+            content=party_data["title"],
             username=interact.user.display_name,
             avatar_url=interact.user.display_avatar.url,
             wait=True,
@@ -251,20 +252,23 @@ class PartyService:
         await msg.edit(embed=new_embed, view=None)
         await delay()
 
-        # edit thread starter msg
-        try:
-            webhook = await get_webhook(
-                interact.channel.parent, interact.client.user.avatar
-            )
-            if webhook:
-                await webhook.edit_message(
-                    message_id=interact.channel.id, content=ts.get(f"{pf}del-deleted")
-                )
-        except:
-            pass  # starter msg not found (maybe deleted manually)
-        await delay()
+        parent_channel = interact.channel.parent
+        avatar = interact.client.user.avatar
 
-        # lock thread
+        result = await webhook_edit(
+            parent_channel,
+            avatar,
+            message_id=interact.channel.id,
+            content=ts.get(f"{pf}del-deleted"),
+        )
+        if not result:
+            print(
+                C.red,
+                "starter message not found! from party_service > execute_delete()",
+                C.default,
+                sep="",
+            )
+
         if isinstance(interact.channel, discord.Thread):
             await interact.channel.edit(locked=True)
 

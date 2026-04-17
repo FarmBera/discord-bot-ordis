@@ -379,8 +379,7 @@ class ConfirmDeleteView(ui.View):
     @ui.button(label=ts.get(f"{pf}del-btny"), style=discord.ButtonStyle.danger)
     async def yes_button(self, interact: discord.Interaction, button: ui.Button):
         await interact.response.defer(ephemeral=True)
-        await self.origin_message.edit(view=None)
-        # await interact.delete_original_response()
+        await interact.delete_original_response()
         await save_log(
             pool=interact.client.db,
             type=LOG_TYPE.event,

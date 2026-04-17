@@ -7,7 +7,7 @@ from src.utils.api_request import API_MarketSearch
 from src.utils.db_helper import transaction, query_reader
 from src.utils.delay import delay
 from src.utils.logging_utils import save_log
-from src.utils.webhook import get_webhook
+from src.utils.webhook import webhook_send, webhook_edit
 
 pf = "cmd.trade."
 
@@ -128,11 +128,8 @@ class TradeService:
 
         interact = job_data["interact"]
         data = job_data["data"]
-
-        webhook = await get_webhook(
-            job_data["target_channel"], interact.client.user.avatar
-        )
-        await delay()
+        target_channel = job_data["target_channel"]
+        avatar = interact.client.user.avatar
 
         thread_name = f"[{data['trade_type']}] {data['item_name']}"
         if data.get("isRank") and data["item_rank"] != -1:
@@ -140,7 +137,9 @@ class TradeService:
                 f" ({ts.get(f'{pf}rank-simple').format(rank=data['item_rank'])})"
             )
 
-        thread_starter_msg = await webhook.send(
+        thread_starter_msg = await webhook_send(
+            target_channel,
+            avatar,
             content=f"**{data['trade_type']}** 합니다.",
             username=interact.user.display_name,
             avatar_url=interact.user.display_avatar.url,
@@ -186,17 +185,15 @@ class TradeService:
         await msg.edit(embed=new_embed, view=None)
         await delay()
 
-        # edit thread starter msg
-        try:
-            webhook = await get_webhook(
-                interact.channel.parent, interact.client.user.avatar
-            )
-            if webhook:
-                await webhook.edit_message(
-                    message_id=interact.channel.id, content=ts.get(f"{pf}deleted")
-                )
-        except:
-            pass  # starter msg not found (maybe deleted manually)
+        parent_channel = interact.channel.parent
+        avatar = interact.client.user.avatar
+
+        await webhook_edit(
+            parent_channel,
+            avatar,
+            message_id=interact.channel.id,
+            content=ts.get(f"{pf}deleted"),
+        )
         await delay()
 
         # lock thread
