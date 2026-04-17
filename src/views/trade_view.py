@@ -170,83 +170,119 @@ class EditNicknameModal(ui.Modal, title=ts.get(f"{pf}edit-nick-title")):
             )
 
 
-class EditQuantityModal(ui.Modal, title=ts.get(f"{pf}edit-qty-title")):
-    def __init__(self, current_quantity: int, interact: discord.Interaction, db_pool):
+class EditTradeModal(ui.Modal, title=ts.get(f"{pf}edit-trade-title")):
+    def __init__(self, trade_data: dict, interact: discord.Interaction, db_pool):
         super().__init__(timeout=None)
         self.db_pool = db_pool
         self.original_message = interact.message
+
+        self.current_quantity = int(trade_data["quantity"])
+        self.current_price = int(trade_data["price"])
+        self.current_rank = int(trade_data.get("item_rank", -1))
+        # Rank field is only rendered for rank-capable items (rank > -1)
+        self.has_rank = self.current_rank > -1
+
         self.quantity_input = ui.TextInput(
             label=ts.get(f"{pf}edit-qty-label"),
-            default=str(current_quantity),
+            default=str(self.current_quantity),
             required=True,
         )
         self.add_item(self.quantity_input)
 
-    async def on_submit(self, interact: discord.Interaction):
-        if not self.quantity_input.value.isdigit():
-            await interact.response.send_message(
-                ts.get(f"{pf}err-invalid-value"), ephemeral=True
-            )
-            return
-
-        if int(self.quantity_input.value) < 1:
-            await interact.response.send_message(
-                ts.get(f"{pf}err-size-low"), ephemeral=True
-            )
-            return
-
-        try:
-            await TradeService.update_quantity(
-                self.db_pool, interact.message.id, self.quantity_input.value
-            )
-            await add_job(JobType.TRADE_UPDATE, {"origin_msg": self.original_message})
-            await interact.client.trigger_queue_processing()
-            await interact.response.send_message(
-                ts.get(f"{pf}edit-requested"), ephemeral=True
-            )
-            await save_log(
-                pool=interact.client.db,
-                type=LOG_TYPE.event,
-                cmd="btn.edit.quantity",
-                interact=interact,
-                msg=f"EditQuantityModal -> Submit '{self.quantity_input.value}'",
-            )
-        except Exception:
-            await interact.response.send_message(
-                ts.get(f"{pf}err-edit"), view=SupportView(), ephemeral=True
-            )
-            await save_log(
-                pool=interact.client.db,
-                type=LOG_TYPE.err,
-                cmd="btn.edit.quantity",
-                interact=interact,
-                msg=f"EditQuantityModal -> Submit, but ERR",
-                obj=f"{self.quantity_input.value}\n{return_traceback()}",
-            )
-
-
-class EditPriceModal(ui.Modal, title=ts.get(f"{pf}edit-price-title")):
-    def __init__(self, current_price: int, interact: discord.Interaction, db_pool):
-        super().__init__(timeout=None)
-        self.db_pool = db_pool
-        self.original_message = interact.message
         self.price_input = ui.TextInput(
             label=ts.get(f"{pf}edit-price-label"),
-            default=str(current_price),
+            default=str(self.current_price),
             required=True,
         )
         self.add_item(self.price_input)
 
+        self.rank_input: ui.TextInput | None = None
+        if self.has_rank:
+            self.rank_input = ui.TextInput(
+                label=ts.get(f"{pf}edit-rank-label"),
+                default=str(self.current_rank),
+                required=True,
+                max_length=2,
+                placeholder="0",
+            )
+            self.add_item(self.rank_input)
+
     async def on_submit(self, interact: discord.Interaction):
-        if not self.price_input.value.isdigit() or int(self.price_input.value) < 0:
+        qty_str = self.quantity_input.value.strip()
+        price_str = self.price_input.value.strip()
+        rank_str = self.rank_input.value.strip() if self.rank_input else None
+
+        # Validate all fields, collect errors together
+        errors: list[str] = []
+        new_quantity: int | None = None
+        new_price: int | None = None
+        new_rank: int | None = None
+
+        # quantity
+        if not qty_str.isdigit():
+            errors.append(
+                f"- {ts.get(f'{pf}edit-qty-label')}: {ts.get(f'{pf}err-invalid-value')}"
+            )
+        else:
+            parsed_qty = int(qty_str)
+            if parsed_qty < 1:
+                errors.append(
+                    f"- {ts.get(f'{pf}edit-qty-label')}: {ts.get(f'{pf}err-size-low')}"
+                )
+            else:
+                new_quantity = parsed_qty
+
+        # price
+        if not price_str.isdigit() or int(price_str) < 0:
+            errors.append(
+                f"- {ts.get(f'{pf}edit-price-label')}: {ts.get(f'{pf}err-invalid-value')}"
+            )
+        else:
+            new_price = int(price_str)
+
+        # rank (optional)
+        if rank_str is not None:
+            if not rank_str.isdigit() or int(rank_str) < 0:
+                errors.append(
+                    f"- {ts.get(f'{pf}edit-rank-label')}: {ts.get(f'{pf}err-invalid-value')}"
+                )
+            else:
+                new_rank = int(rank_str)
+
+        if errors:
+            await interact.response.send_message("\n".join(errors), ephemeral=True)
+            return
+
+        # send only changed value
+        diff_kwargs: dict = {}
+        change_log: list[str] = []
+
+        if new_quantity is not None and new_quantity != self.current_quantity:
+            diff_kwargs["quantity"] = new_quantity
+            change_log.append(f"qty:{self.current_quantity}->{new_quantity}")
+        if new_price is not None and new_price != self.current_price:
+            diff_kwargs["price"] = new_price
+            change_log.append(f"price:{self.current_price}->{new_price}")
+        if self.has_rank and new_rank is not None and new_rank != self.current_rank:
+            diff_kwargs["item_rank"] = new_rank
+            change_log.append(f"rank:{self.current_rank}->{new_rank}")
+
+        if not diff_kwargs:
             await interact.response.send_message(
-                ts.get(f"{pf}err-invalid-value"), ephemeral=True
+                ts.get(f"{pf}edit-no-change"), ephemeral=True
+            )
+            await save_log(
+                pool=interact.client.db,
+                type=LOG_TYPE.event,
+                cmd="btn.edit.trade",
+                interact=interact,
+                msg="EditTradeModal -> Submit, no change",
             )
             return
 
         try:
-            await TradeService.update_price(
-                self.db_pool, interact.message.id, int(self.price_input.value)
+            await TradeService.update_trade_info(
+                self.db_pool, interact.message.id, **diff_kwargs
             )
             await add_job(JobType.TRADE_UPDATE, {"origin_msg": self.original_message})
             await interact.client.trigger_queue_processing()
@@ -256,10 +292,9 @@ class EditPriceModal(ui.Modal, title=ts.get(f"{pf}edit-price-title")):
             await save_log(
                 pool=interact.client.db,
                 type=LOG_TYPE.event,
-                cmd="btn.edit.price",
+                cmd="btn.edit.trade",
                 interact=interact,
-                msg=f"EditPriceModal -> Submit",
-                obj=self.price_input.value,
+                msg=f"EditTradeModal -> Submit {', '.join(change_log)}",
             )
         except Exception:
             await interact.response.send_message(
@@ -268,64 +303,10 @@ class EditPriceModal(ui.Modal, title=ts.get(f"{pf}edit-price-title")):
             await save_log(
                 pool=interact.client.db,
                 type=LOG_TYPE.err,
-                cmd="btn.edit.price",
+                cmd="btn.edit.trade",
                 interact=interact,
-                msg=f"EditPriceModal -> Submit, but ERR",
-                obj=f"{self.price_input.value}\n{return_traceback()}",
-            )
-
-
-class EditRankModal(ui.Modal, title=ts.get(f"{pf}edit-rank-title")):
-    def __init__(self, current_rank: int, interact: discord.Interaction, db_pool):
-        super().__init__(timeout=None)
-        self.db_pool = db_pool
-        self.original_message = interact.message
-        default_val = str(current_rank) if current_rank is not None else "0"
-
-        self.rank_input = ui.TextInput(
-            label=ts.get(f"{pf}edit-rank-label"),
-            default=default_val,
-            required=True,
-            max_length=2,
-            placeholder="0",
-        )
-        self.add_item(self.rank_input)
-
-    async def on_submit(self, interact: discord.Interaction):
-        if not self.rank_input.value.isdigit() or int(self.rank_input.value) < 0:
-            await interact.response.send_message(
-                ts.get(f"{pf}err-invalid-value"), ephemeral=True
-            )
-            return
-
-        try:
-            await TradeService.update_item_rank(
-                self.db_pool, interact.message.id, int(self.rank_input.value)
-            )
-            await add_job(JobType.TRADE_UPDATE, {"origin_msg": self.original_message})
-            await interact.client.trigger_queue_processing()
-            await interact.response.send_message(
-                ts.get(f"{pf}edit-requested"), ephemeral=True
-            )
-            await save_log(
-                pool=interact.client.db,
-                type=LOG_TYPE.event,
-                cmd="btn.edit.rank",
-                interact=interact,
-                msg=f"EditRankModal -> Submit",
-                obj=self.rank_input.value,
-            )
-        except Exception:
-            await interact.response.send_message(
-                ts.get(f"{pf}err-edit"), view=SupportView(), ephemeral=True
-            )
-            await save_log(
-                pool=interact.client.db,
-                type=LOG_TYPE.err,
-                cmd="btn.edit.rank",
-                interact=interact,
-                msg=f"EditRankModal -> Submit, but ERR",
-                obj=f"{self.rank_input.value}\n{return_traceback()}",
+                msg="EditTradeModal -> Submit, but ERR",
+                obj=f"qty={qty_str}, price={price_str}, rank={rank_str}\n{return_traceback()}",
             )
 
 
@@ -560,14 +541,14 @@ class TradeView(ui.View):
             except discord.errors.NotFound:
                 pass
 
-    # btn edit qty
+    # btn edit trade info
     @ui.button(
-        label=ts.get(f"{pf}btn-edit-qty"),
+        label=ts.get(f"{pf}btn-edit-info"),
         style=discord.ButtonStyle.secondary,
-        custom_id="trade_btn_edit_qty",
+        custom_id="trade_btn_edit_info",
     )
-    async def edit_quantity(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "TradeView -> edit_quantity"
+    async def edit_trade_info(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "TradeView -> edit_trade_info"
         trade_data = await self.basic_trade_logic(interact, self.cooldown_manage, cmd)
         if not trade_data:
             return
@@ -576,53 +557,7 @@ class TradeView(ui.View):
             return
 
         await interact.response.send_modal(
-            EditQuantityModal(trade_data["quantity"], interact, interact.client.db)
-        )
-
-    # btn edit price
-    @ui.button(
-        label=ts.get(f"{pf}btn-edit-price"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="trade_btn_edit_price",
-    )
-    async def edit_price(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "TradeView -> edit_price"
-        trade_data = await self.basic_trade_logic(interact, self.cooldown_manage, cmd)
-        if not trade_data:
-            return
-
-        if not await self.check_permissions(interact, trade_data, cmd):
-            return
-
-        await interact.response.send_modal(
-            EditPriceModal(trade_data["price"], interact, interact.client.db)
-        )
-
-    # btn edit rank
-    @ui.button(
-        label=ts.get(f"{pf}btn-edit-rank"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="trade_btn_edit_rank",
-        # row=1,
-    )
-    async def edit_rank(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "TradeView -> edit_rank"
-        trade_data = await self.basic_trade_logic(interact, self.cooldown_manage, cmd)
-        if not trade_data:
-            return
-
-        if not await self.check_permissions(interact, trade_data, cmd):
-            return
-
-        # check rank
-        if trade_data.get("item_rank") <= -1:
-            await interact.response.send_message(
-                ts.get(f"{pf}err-no-rank-item"), ephemeral=True
-            )
-            return
-
-        await interact.response.send_modal(
-            EditRankModal(trade_data["item_rank"], interact, interact.client.db)
+            EditTradeModal(trade_data, interact, interact.client.db)
         )
 
     # edit nickname
@@ -632,7 +567,7 @@ class TradeView(ui.View):
         custom_id="trade_btn_edit_nick",
     )
     async def edit_nickname(self, interact: discord.Interaction, button: ui.Button):
-        cmd = "TradeView -> edit_price"
+        cmd = "TradeView -> edit_nickname"
         trade_data = await self.basic_trade_logic(interact, self.cooldown_manage, cmd)
         if not trade_data:
             return

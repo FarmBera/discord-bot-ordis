@@ -412,8 +412,11 @@ cmd:
     edit-requested: |
       Requested party modification. Please wait a moment...
       If there are many users, modifications may take up to 15 minutes.
-    # PartyEditModal
-    edit-title: Edit Party Info
+    edit-no-change: "Nothing Changed..."
+    edit-err-empty: Please input value
+    date-err-parse: departure convertion error
+
+    edit-all-title: "Edit Party Information"
     edit-title-input: Title
     edit-mission-input: Mission
     edit-desc-input: Description
@@ -454,6 +457,7 @@ cmd:
       If you believe this is an error, please contact the administrator.
     pv-join-btn: "Join"
     pv-leave-btn: "Leave"
+    pv-mod-all: Edit
     pv-host-exit-err: "The host cannot leave the party."
     pv-exited: "You have left the party."
     pv-full: "The party is full."
@@ -621,6 +625,8 @@ cmd:
     expired: "> The trade has automatically expired due to inactivity.."
 
     # modals
+    edit-trade-title: Edit Trade Information
+    btn-edit-info: Edit
     edit-qty-title: "Edit Quantity"
     edit-qty-label: "Please enter the quantity as a number."
     edit-price-title: "Edit Price"
@@ -629,6 +635,7 @@ cmd:
     edit-rank-label: Rank value to edit (Number)
     edit-nick-title: "Edit Nickname"
     edit-nick-label: "Please enter the correct nickname to change to."
+    edit-no-change: "Nothing Changed..."
 
     # errors
     err-type: "Invalid trade type! --> {type}\n\nYou can only use one of the following: {list}"
@@ -842,7 +849,6 @@ cmd:
       To use the 'Ordis' Bot, you must review the Terms of Service and Privacy Policy and agree to them.
       After reviewing each document, please click the **Agree** button if you agree.
       If you do not agree, you will not be able to use the features provided by the bot.
-
       ## [📄 Terms of Service]({HOMEPAGE}/tos)
       ## [🔒 Privacy Policy]({HOMEPAGE}/privacy)
       [⚖ Copyright and Legal Notice]({HOMEPAGE}/legal)

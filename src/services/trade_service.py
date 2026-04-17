@@ -63,28 +63,41 @@ class TradeService:
             )
 
     @staticmethod
-    async def update_quantity(pool, message_id, new_quantity):
-        async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE trade SET quantity = %s WHERE message_id = %s",
-                (new_quantity, message_id),
-            )
+    async def update_trade_info(
+        pool,
+        message_id: int,
+        *,
+        quantity: int | None = None,
+        price: int | None = None,
+        item_rank: int | None = None,
+    ) -> bool:
+        """Update quantity / price / item_rank in a single query.
 
-    @staticmethod
-    async def update_price(pool, message_id, new_price):
-        async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE trade SET price = %s WHERE message_id = %s",
-                (new_price, message_id),
-            )
+        Fields passed as None are left untouched. Returns True if at least
+        one column was included in the UPDATE, False otherwise (no-op).
+        """
+        updates: list[str] = []
+        params: list = []
 
-    @staticmethod
-    async def update_item_rank(pool, message_id, new_rank):
+        if quantity is not None:
+            updates.append("quantity = %s")
+            params.append(quantity)
+        if price is not None:
+            updates.append("price = %s")
+            params.append(price)
+        if item_rank is not None:
+            updates.append("item_rank = %s")
+            params.append(item_rank)
+
+        if not updates:
+            return False
+
+        params.append(message_id)
+        sql = f"UPDATE trade SET {', '.join(updates)} WHERE message_id = %s"
+
         async with transaction(pool) as cursor:
-            await cursor.execute(
-                "UPDATE trade SET item_rank = %s WHERE message_id = %s",
-                (new_rank, message_id),
-            )
+            await cursor.execute(sql, tuple(params))
+        return True
 
     @staticmethod
     async def delete_trade(pool, thread_id):

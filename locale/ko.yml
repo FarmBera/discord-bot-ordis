@@ -412,9 +412,12 @@ cmd:
     edit-requested: |
       파티 수정 작업을 요청했습니다. 잠시만 기다려주세요...
       이용자가 많다면 수정 작업에 최대 15분까지 소요될 수 있습니다.
-    # PartyEditModal
-    edit-title: 파티 정보 수정
-    edit-title-input: 제목
+    edit-no-change: "변경된 내용이 없습니다."
+    edit-err-empty: 값을 입력해주세요.
+    date-err-parse: 출발일 변환 중 문제가 발생했어요
+
+    edit-all-title: "파티 정보 수정"
+    edit-title-input: 파티 제목
     edit-mission-input: 게임 이름
     edit-desc-input: 기타 설명
     edit-err: 수정 중 오류 발생. 개발자에게 문의해주세요.
@@ -454,6 +457,7 @@ cmd:
       만약 오류라고 판단된다면 개발자에게 문의해주세요.
     pv-join-btn: 참여하기
     pv-leave-btn: 탈퇴하기
+    pv-mod-all: 파티 정보 수정
     pv-host-exit-err: 호스트는 파티에서 탈퇴할 수 없어요.
     pv-exited: 파티에서 탈퇴했어요.
     pv-full: 파티가 꽉 찼어요
@@ -621,17 +625,20 @@ cmd:
     expired: "> 활동이 없어 거래가 자동으로 만료되었어요."
 
     # modals
-    edit-qty-title: "수량 수정"
+    edit-trade-title: 거래 정보 수정하기
+    btn-edit-info: 정보 수정
+    edit-qty-title: "수량"
     edit-qty-label: "수량을 숫자로 입력해주세요."
-    edit-price-title: "가격 수정"
+    edit-price-title: "가격"
     edit-price-label: "개당 가격을 숫자로 입력해주세요."
-    edit-rank-title: 아이템 랭크 수정
-    edit-rank-label: 변경할 랭크 (숫자)
+    edit-rank-title: 아이템 랭크
+    edit-rank-label: 변경할 랭크를 숫자로 입력해주세요
     edit-nick-title: "수정 할 워프레임 닉네임\n(정확하게 입력해주세요)"
     edit-nick-label: "입력한 닉네은 귓속말 및 파티초대 명령어 복사 기능을 이용할 때 이용됩니다."
+    edit-no-change: "변경된 내용이 없습니다."
 
     # errors
-    err-type: "올바르지 않은 거래 종류입니다! --> {type}\n\n{list} 중 하나만 사용할 수 있어요"
+    err-type: "올바르지 않은 거래 종류입니다! {type}\n\n{list} 중 하나만 사용할 수 있어요"
 
     err-general: "상호작용 오류. 개발자에게 문의해주세요."
     err-only-host: "거래 글 게시자만 이 버튼을 사용할 수 있어요."
@@ -856,9 +863,9 @@ cmd:
 
     err-not-owner: "본인의 동의 절차만 진행할 수 있습니다."
     err-save: |
-      ❌ 동의 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+      ❌ 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
 
-      문제가 지속된다면, '고양이' 닉네임을 가진 간부진에게 연락 바랍니다.
+      문제가 지속된다면, '고양이' 닉네임을 가진 간부진에게 문의 바랍니다.
 
 trs:
   "Baro'Ki Teel": 바로 키티어
