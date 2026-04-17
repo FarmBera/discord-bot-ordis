@@ -15,7 +15,7 @@
 ### Core Features for Warframe
 
 - Real-time notifications for new in-game content (API)
-- Simple commands to check real-time in-game content (parse API data)
+- Simple commands to check real-time in-game content (Cached API data)
 - Item price lookup on [Warframe.market](https://warframe.market) (API)
 
 ### And More Useful Tools & Management Systems
@@ -53,9 +53,8 @@
 
 ## Copyright
 
-© 2025 FarmBera. All rights reserved.
+© 2025. FarmBera All rights reserved.
 
-This repository is publicly viewable for reference purposes only.
-You may not copy, modify, distribute, or use any part of this code without prior written permission from the author.
-
-Warframe and related content are trademarks of Digital Extremes Ltd.
+- FarmBera holds the copyright to the source code and original content of the "오디스 (Ordis)" bot.
+- Warframe and related logos, images, game data, and proper nouns are the property of Digital Extremes Ltd., and all rights to such content are reserved by Digital Extremes Ltd.
+- The '오디스 (Ordis)' bot is a fan-made bot and is not affiliated with, endorsed by, sponsored by, or officially approved by Digital Extremes Ltd.
