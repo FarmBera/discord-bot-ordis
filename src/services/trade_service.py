@@ -3,13 +3,20 @@ import discord
 from config.config import LOG_TYPE
 from src.parser.marketsearch import categorize
 from src.translator import ts
-from src.utils.api_request import API_MarketSearch
 from src.utils.db_helper import transaction, query_reader
 from src.utils.delay import delay
 from src.utils.logging_utils import save_log
 from src.utils.webhook import webhook_send, webhook_edit
 
 pf = "cmd.trade."
+
+
+class MarketAPIError(Exception):
+    """Raised when the Market API response is missing or invalid."""
+
+    def __init__(self, message: str, status_code: int | None = None):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 class TradeService:
@@ -106,27 +113,34 @@ class TradeService:
 
     @staticmethod
     async def estimate_price(
-        pool, trade_type, item_slug, item_rank, input_price
+        market_api_result, item_rank, input_price
     ) -> tuple[int, list, str]:
         output_msg: str = ""
-        # get market price
-        market_api_result = await API_MarketSearch(pool, item_slug)
-        market = categorize(market_api_result.json(), rank=item_rank)
+        market: list = []
 
-        if market_api_result.status_code == 404:
+        # api failure
+        if market_api_result is None:
+            raise MarketAPIError("No response from market API (request failed)")
+
+        status_code = market_api_result.status_code
+        # item not listed on market
+        if status_code == 404:
             output_msg += f"{ts.get(f'{pf}err-no-market')}\n\n"
             return (input_price if input_price else 0), market, output_msg
-        elif market_api_result.status_code != 200:
-            raise ValueError("Market API resp-code is not 200")
+        # api response error
+        if status_code != 200:
+            raise MarketAPIError(
+                f"Market API responded with status {status_code}",
+                status_code=status_code,
+            )
 
         if input_price:
+            market = categorize(market_api_result.json(), rank=item_rank)
             return input_price, market, output_msg
 
         # automatic price decision
-        price_list = []
-        length = len(market)
-        for i in range(min(length, 6)):
-            price_list.append(market[i]["platinum"])
+        market = categorize(market_api_result.json(), rank=item_rank)
+        price_list = [market[i]["platinum"] for i in range(min(len(market), 6))]
 
         estimated_price = sum(price_list) // len(price_list) if price_list else 0
         output_msg += f"{ts.get(f'{pf}auto-price').format(price=estimated_price)}\n\n"

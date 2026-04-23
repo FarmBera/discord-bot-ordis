@@ -7,8 +7,9 @@ from src.constants.keys import COOLDOWN_CREATE
 from src.parser.marketsearch import get_slug_data, get_market_item_names
 from src.services.channel_service import ChannelService
 from src.services.queue_manager import add_job, JobType
-from src.services.trade_service import TradeService
+from src.services.trade_service import TradeService, MarketAPIError
 from src.translator import ts
+from src.utils.api_request import API_MarketSearch
 from src.utils.logging_utils import save_log
 from src.utils.permission import is_banned_user
 from src.utils.return_err import return_traceback
@@ -102,19 +103,31 @@ class TradeCog(commands.Cog):
 
         # setup price
         try:
+            market_res = await API_MarketSearch(self.bot.db, item_slug)
+
             estimated_price, market_data, output_msg = (
-                await TradeService.estimate_price(
-                    self.bot.db, trade_type.name, item_slug, item_rank, price
-                )
+                await TradeService.estimate_price(market_res, item_rank, price)
             )
+        except MarketAPIError as e:
+            await interact.followup.send(
+                ts.get(f"{pf}err-api"), view=SupportView(), ephemeral=True
+            )
+            await save_log(
+                pool=interact.client.db,
+                type=LOG_TYPE.warn,
+                cmd="cmd.trade",
+                interact=interact,
+                msg=f"Market API unavailable: {e} (status={e.status_code})",
+            )
+            return
         except Exception as e:
             await interact.followup.send(
-                f"{ts.get(f'{pf}err-api')}", view=SupportView(), ephemeral=True
+                ts.get(f"{pf}err-api"), view=SupportView(), ephemeral=True
             )
             await save_log(
                 pool=interact.client.db,
                 type=LOG_TYPE.err,
-                cmd=f"cmd.trade",
+                cmd="cmd.trade",
                 interact=interact,
                 msg=f"Market API error: {e}",
                 obj=return_traceback(),
