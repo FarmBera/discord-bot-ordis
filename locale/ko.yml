@@ -867,6 +867,26 @@ cmd:
 
       문제가 지속된다면, '고양이' 닉네임을 가진 간부진에게 문의 바랍니다.
 
+  emoji:
+    cmd: 이모티콘
+    desc: 서버 이모티콘을 전송합니다.
+    param-name: 표시할 이모티콘 이름
+#    content
+    title: "{guild} 서버 이모티콘"
+    info: 총 {total}개 (일반 {static}개 · 애니메이션 {animated}개)
+    field-static: 일반 이모티콘
+    field-animated: 애니메이션 이모티콘
+#    errors
+    err-no-guild: 서버 안에서만 사용할 수 있는 명령어입니다.
+    err-empty: 이 서버에는 등록된 이모티콘이 없습니다.
+    err-not-found:{name}: 이모티콘을 찾을 수 없습니다.
+  emoji-all:
+    cmd: 모든-이모티콘
+    desc: 서버의 모든 이모티콘을 한 번에 표시합니다
+#    content
+    title: 이 서버에는 총 {total} 개의 등록된 이모티콘이 있어요.
+    footer: "정적 {static}개, 움직이는 이모티콘 {animated}개"
+
 trs:
   "Baro'Ki Teel": 바로 키티어
   # keyword

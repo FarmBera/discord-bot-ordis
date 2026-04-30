@@ -866,3 +866,24 @@ cmd:
       ❌ An error occurred while saving your agreement. Please try again later.
 
       If the problem persists, please contact the staff member with the username '고양이 (Cat)'
+
+  emoji:
+    cmd: emoji
+    desc: Sends a server emoji.
+    param-name: Name of the emoji to display
+#    content
+    title: “{guild} Server Emojis”
+    info: Total {total} (Static {static} · Animated {animated})
+    field-static: Static emojis
+    field-animated: Animated emojis
+#    errors
+    err-no-guild: This command can only be used within the server.
+    err-empty: There are no registered emojis on this server.
+    err-not-found:{name}: The emoji cannot be found.
+  emoji-all:
+    cmd: emoji-all
+    desc: Displays available emojis on this server
+#    content
+    title: There are a total of {total} registered emojis on this server.
+    footer: “{static} static emojis, {animated} animated emojis”
+
