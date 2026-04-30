@@ -147,7 +147,7 @@ class EmojiCommands(commands.Cog):
         )
         embed.set_image(url=emoji.url)
 
-        await interact.followup.send(embed=embed, ephemeral=True)
+        await interact.followup.send(embed=embed)
         await save_log(
             pool=interact.client.db,
             type=LOG_TYPE.cmd,
@@ -227,10 +227,10 @@ class EmojiCommands(commands.Cog):
                 color=discord.Color.darker_gray(),
             )
             if idx == 0:
-                embed.title = ts.get(f"{pf}all-title").format(total=len(emojis))
+                embed.title = ts.get(f"{pf}title").format(total=len(emojis))
             if idx == last_idx:
                 embed.set_footer(
-                    text=ts.get(f"{pf}all-footer").format(
+                    text=ts.get(f"{pf}footer").format(
                         static=static_count,
                         animated=animated_count,
                     )

@@ -884,7 +884,7 @@ cmd:
     cmd: 모든-이모티콘
     desc: 서버의 모든 이모티콘을 한 번에 표시합니다
 #    content
-    title: 이 서버에는 총 {total} 개의 등록된 이모티콘이 있어요.
+    title: 이모티콘 총 {total}
     footer: "정적 {static}개, 움직이는 이모티콘 {animated}개"
 
 trs:
