@@ -104,7 +104,7 @@ class EmojiCommands(commands.Cog):
     @app_commands.describe(name=f"{pf}param-name")
     @discord.app_commands.checks.cooldown(1, 10, key=lambda i: (i.guild_id, i.user.id))
     async def cmd_show_emoji(self, interact: discord.Interaction, name: str) -> None:
-        await interact.response.defer(ephemeral=True)
+        await interact.response.defer()
 
         if await is_banned_user(interact, isFollowUp=True):
             return
