@@ -4,7 +4,6 @@ import discord
 
 from src.translator import Translator, ts as _ts, language as _default_lang
 from src.utils.data_manager import getSolNode, getLanguage
-from src.utils.emoji import get_emoji
 from src.utils.formatter import extract_last_part, add_space, check_str_length
 from src.utils.return_err import err_embed
 from src.utils.times import timeNow, convert_remain
@@ -149,7 +148,8 @@ def w_voidTradersItem(
             if "/lotus" in iname.lower():
                 iname = f"__{add_space(extract_last_part(iname))}__"
 
-            out = f"{itype} / {iname} / {jtem['PrimePrice']} {get_emoji('ducat')} {int((jtem['RegularPrice'])):,} {get_emoji('credit')}"
+            out = f"{itype} / {iname} / {jtem['PrimePrice']} | {int((jtem['RegularPrice'])):,}"
+            # out = f"{itype} / {iname} / {jtem['PrimePrice']} {get_emoji('ducat')} {int((jtem['RegularPrice'])):,} {get_emoji('credit')}"
             list_item.append(out)
 
         list_item.sort()
@@ -169,4 +169,5 @@ def w_voidTradersItem(
 # from src.utils.data_manager import get_obj
 # from src.constants.keys import VOIDTRADERS
 # print(w_voidTraders(get_obj(VOIDTRADERS))[0].description)
-# print(w_voidTradersItem(get_obj(VOIDTRADERS)).description)
+# VTITEM = w_voidTradersItem(get_obj(VOIDTRADERS)).description
+# print(len(VTITEM), VTITEM)

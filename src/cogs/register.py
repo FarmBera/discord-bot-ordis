@@ -60,7 +60,7 @@ from src.parser.sortie import w_sortie
 from src.parser.steelIncursion import w_steelIncursions
 from src.parser.steelPath import w_steelPath
 from src.parser.vallisCycle import w_vallisCycle
-from src.parser.voidTraders import w_voidTraders
+from src.parser.voidTraders import w_voidTraders, w_voidTradersItem
 from src.parser.worldstate import w_worldstate
 from src.services.queue_manager import get_queue_status
 from src.translator import ts, locale_to_lang
@@ -373,21 +373,21 @@ class GeneralCommands(commands.Cog):
         )
 
     # # voidTrader item command
-    # @app_commands.command(
-    #     name="void-traders-item", description="cmd.void-traders-item.desc"
-    # )
-    # @app_commands.checks.cooldown(
-    #     1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
-    # )
-    # async def cmd_traders_item(
-    #     self, interact: discord.Interaction, developer_options: bool = True
-    # ):
-    #     await cmd_helper(
-    #         interact,
-    #         key=VOIDTRADERS,
-    #         parser_func=w_voidTradersItem,
-    #         isPrivateMsg=developer_options,
-    #     )
+    @app_commands.command(
+        name="void-traders-item", description="cmd.void-traders-item.desc"
+    )
+    @app_commands.checks.cooldown(
+        1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
+    )
+    async def cmd_traders_item(
+        self, interact: discord.Interaction, developer_options: bool = True
+    ):
+        await cmd_helper(
+            interact,
+            key=VOIDTRADERS,
+            parser_func=w_voidTradersItem,
+            isPrivateMsg=developer_options,
+        )
 
     # search 'warframe.market' commnad
     @app_commands.command(name="market-search", description="cmd.market-search.desc")
