@@ -37,7 +37,8 @@ CMD_MAINTENANCE: str = "maintenance"
 CMD_EXIT: str = "exit"
 CMD_EXIT_FORCE: str = "exit1"
 
-EXIT_CMD: list = [CMD_EXIT, "ㄷ턋", "멱ㅓ"]
+# for keyboard layout: en / 2set-korean, ko-3set-390, ko-Semoe (2018)
+EXIT_CMD: list = ["ㅅ", "q", CMD_EXIT, "ㄷ턋", "멱ㅓ", "ㄹㄱ뎌"]
 
 
 async def console_input_listener() -> str | None:
