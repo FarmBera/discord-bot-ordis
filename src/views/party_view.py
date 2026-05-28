@@ -637,10 +637,10 @@ class PartyView(ui.View):
 
         user_id = interact.user.id
         is_host: bool = user_id == party["host_id"]
-        is_admin: bool = await is_admin_user(interact, notify=False, cmd=cmd)
         is_participant = any(p["user_id"] == user_id for p in participants)
 
         if check_host and not is_host:
+            is_admin = await is_admin_user(interact, notify=False, cmd=cmd)
             if not is_admin:
                 await interact.response.send_message(
                     ts.get(f"{pf}pv-err-only-host"), ephemeral=True
