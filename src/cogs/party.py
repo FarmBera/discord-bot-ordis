@@ -20,16 +20,16 @@ class PartyCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="party", description="cmd.party.desc")
+    @app_commands.command(name="party", description=f"{pf}desc")
     @app_commands.checks.cooldown(
         1, COOLDOWN_CREATE, key=lambda i: (i.guild_id, i.user.id)
     )
     @app_commands.describe(
-        title="cmd.party.desc-title",
-        game_name="cmd.party.desc-game-name",
-        departure="cmd.party.desc-departure",
-        descriptions="cmd.party.desc-descriptions",
-        number_of_user="cmd.party.desc-number-of-user",
+        title=f"{pf}desc-title",
+        game_name=f"{pf}desc-game-name",
+        departure=f"{pf}desc-departure",
+        descriptions=f"{pf}desc-descriptions",
+        number_of_user=f"{pf}desc-number-of-user",
     )
     async def cmd_create_party(
         self,
@@ -44,7 +44,7 @@ class PartyCog(commands.Cog):
         await save_log(
             pool=interact.client.db,
             type=LOG_TYPE.cmd,
-            cmd=f"cmd.party.create",
+            cmd=f"{pf}create",
             interact=interact,
             msg="cmd used",  # VAR
             obj=f"T:{title}\nTYPE:{game_name}\nDEPT:{departure}\nDESC:{descriptions}\n{number_of_user}",

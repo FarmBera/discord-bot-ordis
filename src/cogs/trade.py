@@ -15,32 +15,30 @@ from src.utils.permission import is_banned_user
 from src.utils.return_err import return_traceback
 from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
-from src.views.trade_view import parseNickname
-
-pf = "cmd.trade."
+from src.views.trade_view import pf, parseNickname
 
 
 class TradeCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="trade", description="cmd.trade.desc")
+    @app_commands.command(name="trade", description=f"{pf}desc")
     @app_commands.checks.cooldown(
         1, COOLDOWN_CREATE, key=lambda i: (i.guild_id, i.user.id)
     )
     @app_commands.choices(
         trade_type=[
-            app_commands.Choice(name=ts.get("cmd.trade.type-sell"), value=1),
-            app_commands.Choice(name=ts.get("cmd.trade.type-buy"), value=2),
+            app_commands.Choice(name=ts.get(f"{pf}type-sell"), value=1),
+            app_commands.Choice(name=ts.get(f"{pf}type-buy"), value=2),
         ]
     )
     @app_commands.describe(
-        trade_type="cmd.trade.desc-trade-type",
-        item_name="cmd.trade.desc-item-name",
-        item_rank="cmd.trade.desc-item-rank",
-        # game_nickname="cmd.trade.desc-nickname",
-        price="cmd.trade.desc-price",
-        quantity="cmd.trade.desc-quantity",
+        trade_type=f"{pf}desc-trade-type",
+        item_name=f"{pf}desc-item-name",
+        item_rank=f"{pf}desc-item-rank",
+        # game_nickname=f"{pf}desc-nickname",
+        price=f"{pf}desc-price",
+        quantity=f"{pf}desc-quantity",
     )
     async def cmd_create_trade(
         self,
