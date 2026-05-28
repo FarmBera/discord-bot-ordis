@@ -51,6 +51,28 @@
 | `aiofiles`   | Async file I/O to avoid blocking the event loop      |
 | `requests`   | External API communication                           |
 
+### Directory Structure
+
+| Directory       | Description                                                                                       |
+|-----------------|---------------------------------------------------------------------------------------------------|
+| api_cache/      | [Hidden] API cache                                                                                |
+| config/         | [Partially Hidden] Configuration file located like general config, runtime setting, private token | 
+| data/           | [Hidden] Static lookup tables for translating API codes                                           |
+| docs/           | [Hidden] Markdown files served as bot help/patch notes etc.                                       |
+| img/            | `.webp` images attached to embed notifications                                                    |
+| locale/         | UI string translations (YAML)                                                                     |
+| src/            | Bot core codes                                                                                    |
+| ㄴ`src/client`   | Overall Structure of the Bot                                                                      |
+| ㄴ`src/cogs`     | List of Slash Commands and Registration Methods                                                   |
+| ㄴ`src/commands` | Legacy slash commands                                                                             |
+| ㄴ`src/handler`  | Change-detection logic for specific content types                                                 |
+| ㄴ`src/parser`   | Convert JSON data received via API into text or a Discord Embed                                   |
+| ㄴ`src/services` | Business logic for party, trade, channel, warn systems                                            |
+| ㄴ`src/views`    | Discord UI persistent views (buttons/modals)                                                      |
+| ㄴ`src/utils`    | Shared utilities (API requests, file I/O, formatting, permissions)                                |                                                          |
+
+### Architecture Diagram
+
 ## Copyright
 
 © 2025. FarmBera All rights reserved.
