@@ -649,6 +649,7 @@ cmd:
     err-size-low: "You cannot enter a value smaller than 1."
     err-no-market: "No search results from 'Warframe Market'. Please enter the price manually.\n(Use the edit price feature.)"
     err-api: "The automatic pricing feature is currently unavailable (API error).\nPlease enter the price manually."
+    err-response: 'Cannot parse data from Warframe.Market. Please input your price manually.'
     err-edit: |
       An error occurred during editing.
       Did you enter a non-numeric value?

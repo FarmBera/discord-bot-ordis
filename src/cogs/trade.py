@@ -117,7 +117,9 @@ class TradeCog(commands.Cog):
                 interact=interact,
                 msg=f"Market API unavailable: {e} (status={e.status_code})",
             )
-            return
+            estimated_price = 0
+            market_data = []
+            output_msg = ts.get(f"{pf}err-response")
         except Exception as e:
             await interact.followup.send(
                 ts.get(f"{pf}err-api"), view=SupportView(), ephemeral=True

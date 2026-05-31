@@ -1,27 +1,11 @@
 import discord
 
-from config.TOKEN import base_url_bounty, BOUNTY_JSON_PATH
-from src.constants.keys import BOUNTY
 from src.translator import ts as _ts, language as _default_lang
-from src.utils.api_request import API_Request
-from src.utils.data_manager import get_obj, getLanguage
+from src.utils.data_manager import getLanguage
 from src.utils.return_err import err_embed
 from src.utils.times import convert_remain
 
 pf: str = "cmd.seasoninfo."
-
-
-async def handleNewSeasoninfo(pool):
-    prev: dict = get_obj(BOUNTY)
-    new = await API_Request(pool, base_url_bounty, BOUNTY_JSON_PATH)
-    new = new.json()
-    if not prev or not new:
-        return None, False
-
-    if prev.get("rot") == new.get("rot"):
-        return new, False
-
-    return new, True
 
 
 def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]:
