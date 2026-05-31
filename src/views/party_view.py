@@ -71,11 +71,12 @@ async def build_party_embed(
     if isinstance(departure_data, dt.datetime):
         time_output = convert_remain(departure_data.timestamp())
     else:
-        time_output = (
-            convert_remain(parseKoreanDatetime(departure_data).timestamp())
-            if departure_data
-            else ts.get(f"{pf}pb-departure-none")
-        )
+        try:
+            time = convert_remain(parseKoreanDatetime(departure_data).timestamp())
+        except Exception:
+            time = None
+
+        time_output = time if time else ts.get(f"{pf}pb-departure-none")
 
     description += f"""### {data['title']} {status_text}
 - **{ts.get(f'{pf}pb-departure')}:** {time_output}
