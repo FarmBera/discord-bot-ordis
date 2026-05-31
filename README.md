@@ -49,7 +49,7 @@
 | `aiomysql`   | Async MariaDB connector for non-blocking DB access   |
 | `orjson`     | High-performance JSON parsing (faster than built-in) |
 | `aiofiles`   | Async file I/O to avoid blocking the event loop      |
-| `requests`   | External API communication                           |
+| `httpx`      | Asynchronous API caller                              |
 
 ### Directory Structure
 

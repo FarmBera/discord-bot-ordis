@@ -1,4 +1,5 @@
-import requests
+import httpx
+import orjson
 
 from config.TOKEN import base_url_warframe, base_url_market, WF_JSON_PATH
 from config.config import LOG_TYPE
@@ -10,6 +11,7 @@ from src.utils.logging_utils import save_log
 from src.utils.return_err import return_traceback
 from src.utils.times import timeNowDT
 
+HttpxClient = httpx.AsyncClient(timeout=60)
 params_market: dict = {"Language": lang, "Platform": "pc"}
 
 
@@ -18,8 +20,8 @@ async def API_internal(pool, url=base_url_warframe):
 
     # API Request
     try:
-        response = requests.get(url, timeout=60)
-    except Exception as e:
+        response = await HttpxClient.get(url)
+    except httpx.HTTPError as e:
         elapsed_time = timeNowDT() - start_time
         msg = f"API request failed!: {elapsed_time}/{e}"
         print(timeNowDT(), C.red, msg, C.default)
@@ -48,8 +50,8 @@ async def API_internal(pool, url=base_url_warframe):
         print(timeNowDT(), C.red, msg, C.default)
         return response
 
-    # check response (is not empty or err value)
-    if response is None:
+    # check response body is not empty
+    if not response.content:
         elapsed_time = timeNowDT() - start_time
         msg = f"response is Empty!: {res_code}/{elapsed_time}"
         print(timeNowDT(), C.red, msg, C.default)
@@ -59,7 +61,23 @@ async def API_internal(pool, url=base_url_warframe):
             cmd="API_Request()",
             user=MSG_BOT,
             msg=msg,
-            obj=response,
+            obj=response.text,
+        )
+        return None
+
+    # validate that the body is parseable JSON before returning
+    try:
+        orjson.loads(response.content)
+    except orjson.JSONDecodeError:
+        msg = f"invalid JSON response: {response.status_code}"
+        print(C.red, msg, C.default)
+        await save_log(
+            pool=pool,
+            type=LOG_TYPE.err,
+            cmd="API_Request()",
+            user=MSG_BOT,
+            msg=msg,
+            obj=response.text,
         )
         return None
 
@@ -87,19 +105,12 @@ async def API_Request(pool, URL=base_url_warframe, fname=WF_JSON_PATH):
 
 # usage for market api
 async def API_MarketSearch(pool, item_name: str):
-    """API request function for warframe.market search
-
-    :param pool: db pool object
-    :param item_name: item name to search
-    :return:
-    """
     try:
-        response = requests.get(
-            url=f"{base_url_market}orders/item/{item_name}",
+        response = await HttpxClient.get(
+            f"{base_url_market}orders/item/{item_name}",
             headers=params_market,
-            timeout=60,
         )
-    except Exception as e:
+    except httpx.HTTPError as e:
         msg = f"API request failed!: {e}"
         print(timeNowDT(), C.red, msg, C.default)
         await save_log(
@@ -111,26 +122,6 @@ async def API_MarketSearch(pool, item_name: str):
             obj=return_traceback(),
         )
         return None
-
-    # check response code
-    # res_code: int = response.status_code
-    # if res_code != 200:
-    #     msg = f"[warn] response code is not 200 (from API_MarketSearch)"
-    #     print(C.red, res_code, msg, C.default)
-    #     return response
-
-    # check response (is not empty)
-    if response is None:
-        msg = f"response is Empty!"
-        await save_log(
-            pool=pool,
-            type=LOG_TYPE.err,
-            cmd="API_MarketSearch()",
-            user=MSG_BOT,
-            msg=msg,
-        )
-        print(C.red, msg, C.default)
-        return response
 
     msg = f"{response.status_code}//{item_name}//{response.elapsed}"
     await save_log(
