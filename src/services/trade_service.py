@@ -1,4 +1,5 @@
 import discord
+import orjson
 
 from config.config import LOG_TYPE
 from src.parser.marketsearch import categorize
@@ -134,12 +135,16 @@ class TradeService:
                 status_code=status_code,
             )
 
-        if input_price:
-            market = categorize(market_api_result.json(), rank=item_rank)
-            return input_price, market, output_msg
+        # guard against a 200 response with a malformed/empty body
+        try:
+            data = orjson.loads(market_api_result.content)
+        except orjson.JSONDecodeError:
+            raise MarketAPIError("Market API returned invalid JSON on status 200")
 
+        market = categorize(data, rank=item_rank)
+        if input_price:
+            return input_price, market, output_msg
         # automatic price decision
-        market = categorize(market_api_result.json(), rank=item_rank)
         price_list = [market[i]["platinum"] for i in range(min(len(market), 6))]
 
         estimated_price = sum(price_list) // len(price_list) if price_list else 0

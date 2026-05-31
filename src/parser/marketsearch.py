@@ -1,4 +1,5 @@
 import discord
+import orjson
 
 from config.TOKEN import base_url_market_image
 from config.config import Lang, LOG_TYPE
@@ -159,7 +160,7 @@ async def w_market_search(
                 cmd="w_market_search()",
                 user=MSG_BOT,
                 msg=f"{name},{item_slug} > 404 Not Found",
-                obj=result.res_code,
+                obj=result.status_code,
             )
             return (
                 discord.Embed(
@@ -175,7 +176,7 @@ async def w_market_search(
                 cmd="w_market_search()",
                 user=MSG_BOT,
                 msg=f"{name},{item_slug} > 500 Internal Server Error",
-                obj=result.res_code,
+                obj=result.status_code,
             )
             return (
                 discord.Embed(description=ts.get(f"{pf}server-err"), color=0xE67E22),
@@ -188,7 +189,7 @@ async def w_market_search(
                 cmd="w_market_search()",
                 user=MSG_BOT,
                 msg=f"{name},{item_slug} > {result.status_code}",
-                obj=result.res_code,
+                obj=result.status_code,
             )
             return discord.Embed(description=ts.get(f"{pf}err"), color=0xE67E22), None
     except Exception as e:
@@ -203,7 +204,7 @@ async def w_market_search(
         return discord.Embed(description=ts.get(f"{pf}err"), color=0xE67E22), None
 
     # init categorize
-    ingame_orders = categorize(result.json(), rank=rank)
+    ingame_orders = categorize(orjson.loads(result.content), rank=rank)
     if not ingame_orders:
         return (
             discord.Embed(

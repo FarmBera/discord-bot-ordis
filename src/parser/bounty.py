@@ -1,24 +1,33 @@
 import discord
+import orjson
 
 from config.TOKEN import base_url_bounty, BOUNTY_JSON_PATH
 from src.constants.keys import BOUNTY
 from src.translator import ts as _ts, language as _default_lang
 from src.utils.api_request import API_Request
 from src.utils.data_manager import (
-    get_obj,
     getLanguage,
     getSolNodeData,
 )
 from src.utils.return_err import err_embed
 from src.utils.times import convert_remain
+from src.utils.data_manager import get_obj_async
 
 pf: str = "cmd.bounty."
 
 
 async def handleNewBounty(pool):
-    prev: dict = get_obj(BOUNTY)
+    prev: dict = await get_obj_async(BOUNTY)
     new = await API_Request(pool, base_url_bounty, BOUNTY_JSON_PATH)
-    new = new.json()
+
+    # parse object
+    try:
+        new = orjson.loads(new.content)
+    except Exception:
+        print("bounty JSON parse error!")
+        return None, False
+
+    # check object
     if not prev or not new:
         return None, False
 
