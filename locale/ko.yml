@@ -880,7 +880,7 @@ cmd:
 #    errors
     err-no-guild: 서버 안에서만 사용할 수 있는 명령어입니다.
     err-empty: 이 서버에는 등록된 이모티콘이 없습니다.
-    err-not-found:{name}: 이모티콘을 찾을 수 없습니다.
+    err-not-found: "{name} 이모티콘을 찾을 수 없습니다."
   emoji-all:
     cmd: 모든-이모티콘
     desc: 서버의 모든 이모티콘을 한 번에 표시합니다

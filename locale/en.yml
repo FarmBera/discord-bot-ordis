@@ -880,7 +880,7 @@ cmd:
 #    errors
     err-no-guild: This command can only be used within the server.
     err-empty: There are no registered emojis on this server.
-    err-not-found:{name}: The emoji cannot be found.
+    err-not-found: "{name} The emoji cannot be found."
   emoji-all:
     cmd: emoji-all
     desc: Displays available emojis on this server
