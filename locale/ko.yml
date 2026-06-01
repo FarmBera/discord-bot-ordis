@@ -397,10 +397,10 @@ cmd:
     arg-descriptions: 파티_설명
     arg-number-of-user: 모집_인원_수
     desc-title: 파티 모집 제목
-    desc-game-name: 게임 이름
+    desc-game-name: "[선택사항] 같이 플레이 할 게임 이름 (기본값: 워프레임)"
     desc-departure: "[선택사항] 입력 예시) 미정, 내일 오후 3시, 다음주 토요일 15시, 23일 17시 등"
     desc-descriptions: "[선택사항] 모집 글에 대한 세부설명"
-    desc-number-of-user: "[선택사항] 최대 파티원 수 (본인 포함)"
+    desc-number-of-user: "[선택사항] 본인을 포함한 최대 파티원 수 (기본값: 4명)"
 
     c-no-desc: (설명 없음)
 

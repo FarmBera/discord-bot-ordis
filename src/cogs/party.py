@@ -35,7 +35,7 @@ class PartyCog(commands.Cog):
         self,
         interact: discord.Interaction,
         title: str,
-        game_name: str,
+        game_name: str = "워프레임",
         departure: str = None,
         descriptions: str = ts.get(f"{pf}c-no-desc"),
         number_of_user: int = 4,
