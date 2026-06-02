@@ -1,4 +1,5 @@
 import datetime as dt
+
 from discord.ext import tasks, commands
 
 from config.config import LOG_TYPE, language as lang, Lang
@@ -6,11 +7,9 @@ from config.roles import ROLES, CHANNELS
 from src.constants.color import C
 from src.constants.keys import MSG_BOT, DUVIRI_ROTATION, STEELPATH
 from src.parser.duviriRotation import (
-    setDuviriRotate,
     w_duviri_warframe,
     w_duviri_incarnon,
 )
-from src.parser.steelIncursion import w_steelIncursions
 from src.parser.steelPath import w_steelPath
 from src.translator import ts
 from src.utils.data_manager import get_obj_async
@@ -38,6 +37,11 @@ class TASKSweek_start_noti(commands.Cog):
     # weekly alert
     @tasks.loop(time=dt.time(hour=9, minute=5, tzinfo=KST))
     async def week_start_noti(self) -> None:
+        # only week start (monday)
+        if dt.datetime.now(dt.timezone.utc).weekday() != 0:
+            return
+
+        # log when execution
         await save_log(
             pool=self.bot.db,
             type=LOG_TYPE.info,
@@ -45,12 +49,6 @@ class TASKSweek_start_noti(commands.Cog):
             user=MSG_BOT,
             msg="Execute week_start_noti()",
         )
-        # daily alert
-        # await self.bot.broadcast_webhook(w_steelIncursions())
-
-        # only week start (monday)
-        if dt.datetime.now(dt.timezone.utc).weekday() != 0:
-            return
 
         # steel essence
         steel_data = await get_obj_async(STEELPATH)
