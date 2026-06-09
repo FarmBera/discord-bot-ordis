@@ -783,10 +783,10 @@ cmd:
     banned: "🚨 **Exceeded the cumulative warning threshold of {ban_threshold} times and have been automatically banned.**"
 
   descendia:
-    cmd: descendia
-    desc: "[Beta] Display this week's Descendia mission list."
+    cmd: descent
+    desc: "[Beta] Display this week's Descent mission list."
 
-    title: "# Weekly Descendia Challenges\n"
+    title: "# Weekly Descent Challenges\n"
 
   register:
     cmd: register

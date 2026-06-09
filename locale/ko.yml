@@ -783,10 +783,10 @@ cmd:
     banned: "🚨 **누적 경고 {ban_threshold}회 초과로 자동 밴 처리**"
 
   descendia:
-    cmd: 디센디아
-    desc: "[베타버전] 디센디아 미션 및 도전 목록을 불러옵니다."
+    cmd: 하강
+    desc: "[베타버전] 하강 미션 및 도전 목록을 불러옵니다."
 
-    title: "# 이번주 디센디아 미션/도전 목록\n"
+    title: "# 이번주 하강 미션/도전 목록\n"
 
   register:
     cmd: 등록

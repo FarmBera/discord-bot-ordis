@@ -22,6 +22,7 @@ from src.constants.keys import (
     VALLISCYCLE,
     BOUNTY,
 )
+from src.constants.keys import DESCENDIA
 from src.parser.alerts import w_alerts
 from src.parser.archimedea import w_deepArchimedea, w_temporalArchimedia
 from src.parser.archonHunt import w_archonHunt
@@ -30,6 +31,7 @@ from src.parser.calendar import w_calendar
 from src.parser.cambionCycle import w_cambionCycle, checkNewCambionState
 from src.parser.cetusCycle import w_cetusCycle, checkNewCetusState
 from src.parser.dailyDeals import w_dailyDeals, getDarvoRandomMsg
+from src.parser.descendia import w_descendia
 from src.parser.duviriCycle import w_duviriCycle, checkNewDuviriState
 from src.parser.duviriRotation import w_duviri_warframe, w_duviri_incarnon
 from src.parser.events import w_events
@@ -149,5 +151,10 @@ DATA_HANDLERS = {
     BOUNTY: {
         HK.parser: w_bounty,
         HK.special_logic: LOGIC.bounty,
+    },
+    DESCENDIA: {
+        HK.parser: w_descendia,
+        HK.update_check: lambda prev, new: prev[0]["Activation"]["$date"]["$numberLong"]
+        != new[0]["Activation"]["$date"]["$numberLong"],
     },
 }
