@@ -787,6 +787,7 @@ cmd:
     desc: "[베타버전] 하강 미션 및 도전 목록을 불러옵니다."
 
     title: "# 이번주 하강 미션/도전 목록\n"
+    remain: "> {time} 만료\n"
 
   register:
     cmd: 등록

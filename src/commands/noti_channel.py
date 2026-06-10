@@ -25,6 +25,7 @@ from src.constants.keys import (
     CAMBIONCYCLE,
     VALLISCYCLE,
     BOUNTY,
+    DESCENDIA,
 )
 from src.translator import ts
 from src.utils.db_helper import transaction
@@ -53,6 +54,7 @@ DB_COLUMN_MAP = {
     CAMBIONCYCLE: "sub_cambion",
     VALLISCYCLE: "sub_vallis",
     BOUNTY: "sub_bounty",
+    DESCENDIA: "sub_descend",
 }
 
 # UI selection

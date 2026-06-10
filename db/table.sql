@@ -127,6 +127,8 @@ CREATE TABLE IF NOT EXISTS webhooks
     sub_duviri      BOOLEAN         NOT NULL DEFAULT 0, -- duviri worldstate
     sub_cambion     BOOLEAN         NOT NULL DEFAULT 0, -- cambion worldstate
     sub_vallis      BOOLEAN         NOT NULL DEFAULT 0, -- vallis worldstate
+    sub_bounty      BOOLEAN         NOT NULL DEFAULT 0, -- bounty in zariman, hex etc.
+    sub_descend     BOOLEAN         NOT NULL DEFAULT 0, -- descend content in dark refractory
     PRIMARY KEY (channel_id)
 ) DEFAULT CHARSET = 'utf8mb4'
 ;

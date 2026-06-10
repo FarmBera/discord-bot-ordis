@@ -24,7 +24,7 @@
             "EndlessXpChoicesIncarnon": true,
             "EndlessXpChoicesWarframe": true,
             "Goals": true,
-            "Descents": false,
+            "Descents": true,
             "Bounty": true
         }
     },

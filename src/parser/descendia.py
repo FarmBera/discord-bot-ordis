@@ -4,7 +4,7 @@ from config.config import Lang
 from src.translator import Translator, ts as _ts, language as _default_lang
 from src.utils.file_io import json_load
 from src.utils.return_err import err_embed
-from src.utils.times import timeNow
+from src.utils.times import timeNow, convert_remain
 
 descendiaLanguage: dict = {
     Lang.EN: json_load(f"data/{Lang.EN}/descendiaLanguages.json"),
@@ -40,7 +40,7 @@ def w_descendia(
 
     this_week_content = None
     this_week_index: int = 0
-    output_msg: str = ""
+    expiry_time_int: int = 0
 
     # find this week's descendia challenges
     for item in descendia:
@@ -48,6 +48,7 @@ def w_descendia(
         expiry_time: int = int(item["Expiry"]["$date"]["$numberLong"][:10])
         if activation_time <= timeNow() <= expiry_time:
             this_week_content = item
+            expiry_time_int = expiry_time if expiry_time else 0
             break
 
         this_week_index += 1
@@ -56,7 +57,9 @@ def w_descendia(
         return err_embed("ERROR: Descendia Content Not Found"), ""
 
     # generate output msg
-    output_msg += ts.get(f"{pf}title")
+    output_msg = ts.get(f"{pf}title")
+    if expiry_time_int:
+        output_msg += ts.get(f"{pf}remain").format(time=convert_remain(expiry_time_int))
 
     for challenge in descendia[this_week_index]["Challenges"]:
         output_msg += f"{challenge['Index']:2d}. {getDescendiaMiss(challenge['Type'], lang)}: {getDescendiaChallenge(challenge['Challenge'], lang)}\n"
