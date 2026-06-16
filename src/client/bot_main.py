@@ -20,7 +20,6 @@ from src.translator import ts
 from src.utils.data_manager import SETTINGS
 from src.utils.db_helper import query_reader
 from src.utils.delay import delay
-from src.utils.discord_file import img_file
 from src.utils.logging_utils import save_log
 from src.utils.return_err import return_traceback
 from src.utils.times import timeNowDT
@@ -102,64 +101,6 @@ class DiscordBot(commands.Bot):
             f"{C.blue}[{LOG_TYPE.info}] {C.green}{ts.get('start.coroutine')}{C.default}"
         )
         print(C.white, timeNowDT(), C.default, sep="")
-
-    async def send_alert(
-        self, value: discord.Embed | tuple[discord.Embed, str] | str, channel_list: list
-    ) -> None:
-        # send message
-        for ch in channel_list:
-            try:
-                channel = self.get_channel(ch)
-                msg: str = f"msg sent"
-                if isinstance(value, discord.Embed):
-                    await save_log(
-                        pool=self.db,
-                        type=LOG_TYPE.msg,
-                        cmd="auto_sent_message",
-                        user=MSG_BOT,
-                        guild=channel.guild.name,
-                        channel=channel.name,
-                        msg=msg,
-                        obj=value.description,
-                    )
-                    await channel.send(embed=value)
-                elif isinstance(value, tuple):  # embed with file
-                    eb, f = value
-                    await save_log(
-                        pool=self.db,
-                        type=LOG_TYPE.msg,
-                        cmd="auto_sent_message",
-                        user=MSG_BOT,
-                        guild=channel.guild.name,
-                        channel=channel.name,
-                        msg=msg,
-                        obj=eb.description,
-                    )
-                    f = img_file(f)
-                    await channel.send(embed=eb, file=f)
-                else:  # string type
-                    await save_log(
-                        pool=self.db,
-                        type=LOG_TYPE.msg,
-                        cmd="auto_sent_message",
-                        user=MSG_BOT,
-                        guild=channel.guild.name,
-                        channel=channel.name,
-                        msg=msg,
-                        obj=value,
-                    )
-                    await channel.send(value)
-            except Exception as e:
-                error_msg = f"[Error] error on sending in {ch}: {e}"
-                print(f"{C.red}{error_msg}{C.default}")
-                await save_log(
-                    pool=self.db,
-                    type=LOG_TYPE.err,
-                    cmd="send_alert",
-                    user=MSG_BOT,
-                    msg=error_msg,
-                    obj=return_traceback(),
-                )
 
     async def get_profile_img(self, noti_key):
         out_name = self.user.name
