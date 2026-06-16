@@ -241,7 +241,7 @@ cmd:
 
     output: |
       # 주간 스틸에센스 교환 보상
-      - {timer} 만료
+      > {timer} 만료
     week: __남은 시간__
     item: __< 아이템 >__
     cost: __교환 개수__

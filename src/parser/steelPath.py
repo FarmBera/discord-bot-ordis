@@ -56,23 +56,17 @@ def w_steelPath(
 
     output_msg = ts.get(f"{pf}output").format(timer=weekly_remain())
 
-    # data list
-    weeks: list = []
-    items: list = []
-    costs: list = []
-
-    # print item list
+    # text layout
     for i in range(length):
         target_item = stl[i]
         origin_name = target_item["name"]
         name = f"{get_emoji(origin_name)} {ts.trs(origin_name)}"
-        cost = f"{target_item['cost']}x {get_emoji('essense')}"
+        # cost = f"{target_item['cost']}x {get_emoji('steel-essense')}"
 
         # this week item
         if i == curr_idx:
-            weeks.append(f"__**{ts.get(f'{pf}current')}**__")
-            items.append(f"__**{name}**__")
-            costs.append(f"__**{cost}**__")
+            output_msg += f"{i+1}. __**{ts.get(f'{pf}current')}**__: __**{name}**__\n"
+            # output_msg += f"(__**{cost}**__)\n"
         else:
             if i > curr_idx:
                 delta = i - curr_idx
@@ -80,22 +74,55 @@ def w_steelPath(
                 delta = length - curr_idx + i
             delta -= 1
 
-            weeks.append(weekly_remain(delta))
-            items.append(name)
-            costs.append(cost)
+            output_msg += f"{i+1}. {weekly_remain(delta)}: {name}\n"
+            # output_msg += f" ({cost})\n"
 
     embed = discord.Embed(
         description=output_msg.strip(),
         colour=color_list.get(cname, discord.Color.darker_grey()),
     )
     embed.set_thumbnail(url="attachment://i.webp")
-    embed.add_field(name=ts.get(f"{pf}week"), value=pat.join(weeks), inline=True)
-    embed.add_field(name=ts.get(f"{pf}item"), value=pat.join(items), inline=True)
-    embed.add_field(name=ts.get(f"{pf}cost"), value=pat.join(costs), inline=True)
     return embed, img_list.get(cname, "riven-mod")
+
+    # # table layout
+    # weeks: list = []
+    # items: list = []
+    # costs: list = []
+    # for i in range(length):
+    #     target_item = stl[i]
+    #     origin_name = target_item["name"]
+    #     name = f"{get_emoji(origin_name)} {ts.trs(origin_name)}"
+    #     cost = f"{target_item['cost']}x {get_emoji('essense')}"
+    #
+    #     # this week item
+    #     if i == curr_idx:
+    #         weeks.append(f"__**{ts.get(f'{pf}current')}**__")
+    #         items.append(f"__**{name}**__")
+    #         costs.append(f"__**{cost}**__")
+    #     else:
+    #         if i > curr_idx:
+    #             delta = i - curr_idx
+    #         else:
+    #             delta = length - curr_idx + i
+    #         delta -= 1
+    #
+    #         weeks.append(weekly_remain(delta))
+    #         items.append(name)
+    #         costs.append(cost)
+    #
+    # embed = discord.Embed(
+    #     description=output_msg.strip(),
+    #     colour=color_list.get(cname, discord.Color.darker_grey()),
+    # )
+    # embed.set_thumbnail(url="attachment://i.webp")
+    # embed.add_field(name=ts.get(f"{pf}week"), value=pat.join(weeks), inline=True)
+    # embed.add_field(name=ts.get(f"{pf}item"), value=pat.join(items), inline=True)
+    # embed.add_field(name=ts.get(f"{pf}cost"), value=pat.join(costs), inline=True)
+    # return embed, img_list.get(cname, "riven-mod")
 
 
 # from src.utils.data_manager import get_obj
 # from src.constants.keys import STEELPATH
-# d = w_steelPath(get_obj(STEELPATH))
+# d: tuple[discord.Embed, str] = w_steelPath(get_obj(STEELPATH))
+# print(d[0].description)
 # print(d[0].fields[1].value, d[1], sep="\n")

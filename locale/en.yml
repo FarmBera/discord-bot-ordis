@@ -241,7 +241,7 @@ cmd:
 
     output: |
       # Teshin's Steel Essense Offer
-      - Expiry: {timer}
+      > Expiry: {timer}
     week: __Remains__
     item: __< Item >__
     cost: __Cost__
