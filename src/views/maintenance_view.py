@@ -53,11 +53,11 @@ EVENT_TYPE: str = f"{LOG_TYPE.event}.{LOG_TYPE.maintenance}"
 EVENT_COOLDOWN: str = LOG_TYPE.cooldown
 
 
-pf: str = "cmd.party."
-pf_edit: str = f"{pf}p-edit-modal-"
-pf_size: str = f"{pf}p-size-modal-"
-pf_btn: str = f"{pf}p-del-modal-"
-pf_pv: str = f"{pf}pv-"
+pfp: str = "cmd.party."
+pf_edit: str = f"{pfp}p-edit-modal-"
+pf_size: str = f"{pfp}p-size-modal-"
+pf_btn: str = f"{pfp}p-del-modal-"
+pf_pv: str = f"{pfp}pv-"
 
 
 class PartyView(discord.ui.View):
@@ -74,7 +74,7 @@ class PartyView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-join-btn"),
+        label=ts.get(f"{pfp}pv-join-btn"),
         style=discord.ButtonStyle.success,
         custom_id="party_join",
         row=1,
@@ -93,7 +93,7 @@ class PartyView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-leave-btn"),
+        label=ts.get(f"{pfp}pv-leave-btn"),
         style=discord.ButtonStyle.danger,
         custom_id="party_leave",
         row=1,
@@ -112,7 +112,7 @@ class PartyView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-mod-all"),
+        label=ts.get(f"{pfp}pv-mod-all"),
         style=discord.ButtonStyle.secondary,
         custom_id="party_edit_info",
         row=1,
@@ -129,7 +129,7 @@ class PartyView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-done"),
+        label=ts.get(f"{pfp}pv-done"),
         style=discord.ButtonStyle.primary,
         custom_id="party_toggle_close",
         row=2,
@@ -146,7 +146,7 @@ class PartyView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-call-label"),
+        label=ts.get(f"{pfp}pv-call-label"),
         style=discord.ButtonStyle.secondary,
         custom_id="party_call_members",
         row=2,
@@ -163,7 +163,7 @@ class PartyView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-kick-label"),
+        label=ts.get(f"{pfp}pv-kick-label"),
         style=discord.ButtonStyle.secondary,
         custom_id="party_kick_member",
         row=2,
@@ -180,7 +180,7 @@ class PartyView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}pv-del-label"),
+        label=ts.get(f"{pfp}pv-del-label"),
         style=discord.ButtonStyle.danger,
         custom_id="party_delete",
         row=2,
@@ -197,7 +197,7 @@ class PartyView(discord.ui.View):
         )
 
 
-pf: str = "cmd.trade."
+pft: str = "cmd.trade."
 
 
 class TradeView(discord.ui.View):
@@ -211,7 +211,7 @@ class TradeView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}btn-trade"),
+        label=ts.get(f"{pft}btn-trade"),
         style=discord.ButtonStyle.primary,
         custom_id="trade_btn_trade",
     )
@@ -227,7 +227,7 @@ class TradeView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}btn-edit-info"),
+        label=ts.get(f"{pft}btn-edit-info"),
         style=discord.ButtonStyle.secondary,
         custom_id="trade_btn_edit_info",
     )
@@ -243,7 +243,7 @@ class TradeView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}btn-edit-nickname"),
+        label=ts.get(f"{pft}btn-edit-nickname"),
         style=discord.ButtonStyle.secondary,
         custom_id="trade_btn_edit_nick",
     )
@@ -259,7 +259,7 @@ class TradeView(discord.ui.View):
         )
 
     @ui.button(
-        label=ts.get(f"{pf}btn-close"),
+        label=ts.get(f"{pft}btn-close"),
         style=discord.ButtonStyle.danger,
         custom_id="trade_btn_edit_close",
     )

@@ -4,17 +4,16 @@ from discord.ext import commands
 # from src.main import tree
 from config.config import LOG_TYPE
 from src.bot_translator import BotTranslator
-from src.commands.cmd_maintenance import PartyView, TradeView
 from src.constants.color import C
 from src.constants.keys import MSG_BOT
 from src.translator import ts
 from src.utils.db_helper import transaction
 from src.utils.logging_utils import save_log
 from src.utils.times import timeNowDT
+from src.views.maintenance_view import PartyView, TradeView
 
 
 class MaintanceBot(commands.Bot):
-
     def __init__(self, *, intents: discord.Intents, db, **options):
         super().__init__(command_prefix="!", intents=intents, **options)
         self.db = db

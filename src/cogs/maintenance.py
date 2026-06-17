@@ -2,7 +2,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from src.commands.cmd_maintenance import cmd_helper_maintenance
 from src.constants.keys import (
     # cooldown var
     COOLDOWN_DEFAULT,
@@ -44,6 +43,7 @@ from src.constants.keys import (
 from src.parser.marketsearch import get_market_item_names
 from src.translator import ts, locale_to_lang
 from src.utils.cmd_helper import cmd_helper_txt
+from src.views.maintenance_view import cmd_helper_maintenance
 
 
 class MaintenanceCommands(commands.Cog):
