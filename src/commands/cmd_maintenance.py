@@ -1,6 +1,7 @@
 import datetime as dt
 
 import discord
+from discord import ui
 from discord.ext import commands
 
 from config.config import LOG_TYPE
@@ -72,235 +73,125 @@ class PartyView(discord.ui.View):
             1, COOLDOWN_BTN_CALL, commands.BucketType.user
         )
 
-    async def is_cooldown(
-        self, interact: discord.Interaction, cooldown_mapping: commands.CooldownMapping
-    ) -> bool:
-        bucket = cooldown_mapping.get_bucket(interact.message)
-        retry = bucket.update_rate_limit()
-        if retry:
-            await interact.response.send_message(
-                embed=discord.Embed(
-                    title=ts.get(f"cmd.err-cooldown.title"),
-                    description=ts.get("cmd.err-cooldown.btn").format(
-                        time=f"{int(retry)}"
-                    ),
-                    color=0xFF0000,
-                ),
-                ephemeral=True,
-            )
-            return True
-        return False
-
-    @discord.ui.button(
-        label=ts.get(f"{pf_pv}join-btn"),
+    @ui.button(
+        label=ts.get(f"{pf}pv-join-btn"),
         style=discord.ButtonStyle.success,
         custom_id="party_join",
+        row=1,
     )
     async def join_party(
         self, interact: discord.Interaction, button: discord.ui.Button
     ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_action):
-            etype += EVENT_COOLDOWN
-            return
-
+        cmd = "PartyView.btn.join"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.join",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
             msg=f"PartyView -> join_party",
         )
 
-    @discord.ui.button(
-        label=ts.get(f"{pf_pv}leave-btn"),
+    @ui.button(
+        label=ts.get(f"{pf}pv-leave-btn"),
         style=discord.ButtonStyle.danger,
         custom_id="party_leave",
+        row=1,
     )
     async def leave_party(
         self, interact: discord.Interaction, button: discord.ui.Button
     ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_action):
-            etype += EVENT_COOLDOWN
-            return
-
+        cmd = "PartyView.btn.leave"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.leave",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
             msg=f"PartyView -> leave_party",
         )
 
-    @discord.ui.button(
-        label=ts.get(f"{pf_pv}mod-label"),
+    @ui.button(
+        label=ts.get(f"{pf}pv-mod-all"),
         style=discord.ButtonStyle.secondary,
-        custom_id="party_edit_size",
+        custom_id="party_edit_info",
+        row=1,
     )
-    async def edit_size(self, interact: discord.Interaction, button: discord.ui.Button):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def edit_info(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "PartyView.btn.edit-info"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.edit-size",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
-            msg=f"PartyView -> edit_size",
+            msg=f"PartyView -> edit_info",
         )
 
-    @discord.ui.button(
-        label=ts.get(f"{pf_pv}mod-article"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="party_edit_content",
-    )
-    async def edit_content(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
-        await cmd_helper_maintenance(interact)
-
-        await save_log(
-            pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.edit-content",
-            interact=interact,
-            msg=f"PartyView -> edit_content",
-        )
-
-    @discord.ui.button(  # 날짜 수정
-        label=ts.get(f"{pf}date-btn"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="party_edit_departure",
-    )
-    async def edit_departure(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
-        await cmd_helper_maintenance(interact)
-
-        await save_log(
-            pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.edit_departure",
-            interact=interact,
-            msg=f"PartyView -> edit_departure",
-        )
-
-    @discord.ui.button(
-        label=ts.get(f"{pf_pv}done"),
+    @ui.button(
+        label=ts.get(f"{pf}pv-done"),
         style=discord.ButtonStyle.primary,
         custom_id="party_toggle_close",
+        row=2,
     )
-    async def toggle_close_party(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def toggle_close(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "PartyView.btn.togle-close"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.toggle_close_party",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
-            msg=f"PartyView -> toggle_close_party",
+            msg=f"PartyView -> toggle_close",
         )
 
-    @discord.ui.button(  # 파티원 호출
+    @ui.button(
         label=ts.get(f"{pf}pv-call-label"),
         style=discord.ButtonStyle.secondary,
         custom_id="party_call_members",
+        row=2,
     )
-    async def call_members(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def call_members(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "PartyView.btn.member-call"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.call_members",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
             msg=f"PartyView -> call_members",
         )
 
-    @discord.ui.button(  # 멤버 내보내기
+    @ui.button(
         label=ts.get(f"{pf}pv-kick-label"),
         style=discord.ButtonStyle.secondary,
         custom_id="party_kick_member",
+        row=2,
     )
-    async def kick_member(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def kick_member(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "PartyView.btn.member-kick"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.kick_member",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
             msg=f"PartyView -> kick_member",
         )
 
-    @discord.ui.button(
+    @ui.button(
         label=ts.get(f"{pf}pv-del-label"),
         style=discord.ButtonStyle.danger,
         custom_id="party_delete",
+        row=2,
     )
-    async def delete_party(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def delete_party(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "PartyView.btn.delete-party"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.delete_party",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
             msg=f"PartyView -> delete_party",
         )
@@ -312,9 +203,6 @@ pf: str = "cmd.trade."
 class TradeView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-        self.cooldown_action = commands.CooldownMapping.from_cooldown(
-            1, COOLDOWN_ACTION, commands.BucketType.user
-        )
         self.cooldown_manage = commands.CooldownMapping.from_cooldown(
             1, COOLDOWN_SHORT, commands.BucketType.user
         )
@@ -322,159 +210,66 @@ class TradeView(discord.ui.View):
             1, COOLDOWN_BTN_CALL, commands.BucketType.user
         )
 
-    async def is_cooldown(
-        self, interact: discord.Interaction, cooldown_mapping: commands.CooldownMapping
-    ) -> bool:
-        bucket = cooldown_mapping.get_bucket(interact.message)
-        retry = bucket.update_rate_limit()
-        if retry:
-            await interact.response.send_message(
-                embed=discord.Embed(
-                    title=ts.get(f"cmd.err-cooldown.title"),
-                    description=ts.get("cmd.err-cooldown.btn").format(
-                        time=f"{int(retry)}"
-                    ),
-                    color=0xFF0000,
-                ),
-                ephemeral=True,
-            )
-            return True
-        return False
-
-    @discord.ui.button(  # 거래하기
+    @ui.button(
         label=ts.get(f"{pf}btn-trade"),
         style=discord.ButtonStyle.primary,
         custom_id="trade_btn_trade",
     )
-    async def trade_action(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_call):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def trade_action(self, interact: discord.Interaction, button: ui.Button):
+        cmd: str = "TradeView -> trade_action"
         await cmd_helper_maintenance(interact)
-
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd=f"btn.trade",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
-            msg=f"TradeView -> trade_action",
+            msg=cmd,
         )
 
-    @discord.ui.button(  # 수량 변경
-        label=ts.get(f"{pf}btn-edit-qty"),
+    @ui.button(
+        label=ts.get(f"{pf}btn-edit-info"),
         style=discord.ButtonStyle.secondary,
-        custom_id="trade_btn_edit_qty",
+        custom_id="trade_btn_edit_info",
     )
-    async def edit_quantity(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def edit_trade_info(self, interact: discord.Interaction, button: ui.Button):
+        cmd: str = "TradeView -> edit_trade_info"
         await cmd_helper_maintenance(interact)
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.edit-quantity",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
-            msg=f"TradeView -> edit_quantity",
+            msg=cmd,
         )
 
-    @discord.ui.button(  # 가격 수정
-        label=ts.get(f"{pf}btn-edit-price"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="trade_btn_edit_price",
-    )
-    async def edit_price(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
-        await cmd_helper_maintenance(interact)
-        await save_log(
-            pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.edit-price",
-            interact=interact,
-            msg=f"TradeView -> edit_price",
-        )
-
-    @discord.ui.button(  # 랭크 수정
-        label=ts.get(f"{pf}btn-edit-rank"),
-        style=discord.ButtonStyle.secondary,
-        custom_id="trade_btn_edit_rank",
-    )
-    async def edit_rank(self, interact: discord.Interaction, button: discord.ui.Button):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
-        await cmd_helper_maintenance(interact)
-        await save_log(
-            pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.edit-rank",
-            interact=interact,
-            msg=f"TradeView -> edit_rank",
-        )
-
-    @discord.ui.button(  # 닉네임 변경
+    @ui.button(
         label=ts.get(f"{pf}btn-edit-nickname"),
         style=discord.ButtonStyle.secondary,
         custom_id="trade_btn_edit_nick",
     )
-    async def edit_nickname(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def edit_nickname(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "TradeView -> edit_nickname"
         await cmd_helper_maintenance(interact)
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.main.edit-price",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
-            msg=f"TradeView -> edit_price",
+            msg=cmd,
         )
 
-    @discord.ui.button(  # 거래 글 닫기
+    @ui.button(
         label=ts.get(f"{pf}btn-close"),
         style=discord.ButtonStyle.danger,
         custom_id="trade_btn_edit_close",
     )
-    async def close_trade(
-        self, interact: discord.Interaction, button: discord.ui.Button
-    ):
-        etype: str = EVENT_TYPE
-
-        if await self.is_cooldown(interact, self.cooldown_manage):
-            etype += EVENT_COOLDOWN
-            return
-
+    async def close_trade(self, interact: discord.Interaction, button: ui.Button):
+        cmd = "TradeView -> close_trade"
         await cmd_helper_maintenance(interact)
         await save_log(
             pool=interact.client.db,
-            type=etype,
-            cmd="btn.trade.toggle_close_party",
+            type=EVENT_TYPE,
+            cmd=cmd,
             interact=interact,
-            msg=f"TradeView -> close_trade",
-            # obj=new_status,
+            msg=cmd,
         )

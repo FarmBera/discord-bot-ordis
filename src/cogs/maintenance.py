@@ -22,7 +22,6 @@ from src.constants.keys import (
     ARCHIMEDEA,
     ARCHIMEDEA_DEEP,
     ARCHIMEDEA_TEMPORAL,
-    # DUVIRICYCLE,
     FISSURES,
     DUVIRICYCLE,
     CALENDAR,
@@ -40,9 +39,10 @@ from src.constants.keys import (
     WORLDSTATE,
     BOUNTY,
     SEASONINFO,
+    COOLDOWN_CREATE,
 )
 from src.parser.marketsearch import get_market_item_names
-from src.translator import ts
+from src.translator import ts, locale_to_lang
 from src.utils.cmd_helper import cmd_helper_txt
 
 
@@ -52,7 +52,7 @@ class MaintenanceCommands(commands.Cog):
 
     # help command
     @app_commands.command(name="help", description="cmd.help.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_help(
@@ -64,7 +64,7 @@ class MaintenanceCommands(commands.Cog):
 
     # announcement command
     @app_commands.command(name="announcement", description="cmd.announcement.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_announcement(
@@ -76,7 +76,7 @@ class MaintenanceCommands(commands.Cog):
 
     # patch-note command
     @app_commands.command(name="patch-note", description="cmd.patch-note.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_patch_note(
@@ -86,17 +86,19 @@ class MaintenanceCommands(commands.Cog):
 
     # privacy-policy command
     @app_commands.command(name="privacy-policy", description="cmd.privacy-policy.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_privacy_policy(
         self, interact: discord.Interaction, developer_options: bool = False
     ):
-        await cmd_helper_txt(interact, file_name=POLICY_FILE_LOC)
+        await cmd_helper_txt(
+            interact, file_name=POLICY_FILE_LOC, isPrivateMsg=developer_options
+        )
 
     # news command
     @app_commands.command(name="news", description="cmd.news.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_news(
@@ -106,7 +108,7 @@ class MaintenanceCommands(commands.Cog):
 
     # alerts command
     @app_commands.command(name="alerts", description="cmd.alerts.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_alerts(
@@ -116,6 +118,9 @@ class MaintenanceCommands(commands.Cog):
 
     # cetus command (cetusCycle)
     @app_commands.command(name="cetus", description="cmd.cetus.desc")
+    @app_commands.checks.cooldown(
+        1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
+    )
     async def cmd_cetus(
         self, interact: discord.Interaction, developer_options: bool = True
     ):
@@ -123,7 +128,7 @@ class MaintenanceCommands(commands.Cog):
 
     # sortie command
     @app_commands.command(name="sortie", description="cmd.sortie.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_sortie(
@@ -133,7 +138,7 @@ class MaintenanceCommands(commands.Cog):
 
     # archon hunt command
     @app_commands.command(name="archon-hunt", description="cmd.archon-hunt.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_archon_hunt(
@@ -143,7 +148,7 @@ class MaintenanceCommands(commands.Cog):
 
     # void traders command
     @app_commands.command(name="void-traders", description="cmd.void-traders.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_voidTraders(
@@ -155,7 +160,7 @@ class MaintenanceCommands(commands.Cog):
     @app_commands.command(
         name="steel-path-reward", description="cmd.steel-path-reward.desc"
     )
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_steel_reward(
@@ -165,7 +170,7 @@ class MaintenanceCommands(commands.Cog):
 
     # fissures command
     @app_commands.command(name="fissures", description="cmd.fissures.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     # @discord.app_commands.choices(
@@ -191,7 +196,7 @@ class MaintenanceCommands(commands.Cog):
     @app_commands.command(
         name="deep-archimedea", description="cmd.deep-archimedea.desc"
     )
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_deep_archimedea(
@@ -204,7 +209,7 @@ class MaintenanceCommands(commands.Cog):
         name="temporal-archimedea",
         description=ts.get(f"cmd.temporal-archimedea.desc"),
     )
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_temporal_archimedea(
@@ -222,7 +227,7 @@ class MaintenanceCommands(commands.Cog):
     ):
         await cmd_helper_maintenance(interact, DUVIRICYCLE)
 
-    # 1999 달력
+    # 1999 calendar
     @app_commands.command(name="calendar", description="cmd.calendar.desc")
     # @app_commands.choices(types=[app_commands.Choice(name="Prize", value=1),app_commands.Choice(name="To-Do", value=2),app_commands.Choice(name="Over", value=3)])
     @app_commands.checks.cooldown(
@@ -248,7 +253,7 @@ class MaintenanceCommands(commands.Cog):
 
     # dailyDeals command
     @app_commands.command(name="dailydeals", description="cmd.dailydeals.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_dailydeals(
@@ -258,7 +263,7 @@ class MaintenanceCommands(commands.Cog):
 
     # invasions command
     @app_commands.command(name="invasions", description="cmd.invasions.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_invasions(
@@ -270,7 +275,7 @@ class MaintenanceCommands(commands.Cog):
     @app_commands.command(
         name="void-traders-item", description="cmd.void-traders-item.desc"
     )
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_traders_item(
@@ -280,7 +285,7 @@ class MaintenanceCommands(commands.Cog):
 
     # search 'warframe.market' commnad
     @app_commands.command(name="market-search", description="cmd.market-search.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     @app_commands.describe(
@@ -303,9 +308,10 @@ class MaintenanceCommands(commands.Cog):
         self, interact: discord.Interaction, current: str
     ) -> list[discord.app_commands.Choice[str]]:
         """Autocompletes the item name for the market search."""
+        user_lang = locale_to_lang(interact.locale)
         choices = [
             discord.app_commands.Choice(name=name, value=name)
-            for name in get_market_item_names()
+            for name in get_market_item_names(user_lang)
             if current.lower() in name.lower()
         ]
         return choices[:25]
@@ -326,7 +332,7 @@ class MaintenanceCommands(commands.Cog):
         description="cmd.duviri-circuit.wf-desc",
         extras={"key": "cmd.duviri-circuit.wf-cmd"},
     )
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_circuit_wf(
@@ -340,7 +346,7 @@ class MaintenanceCommands(commands.Cog):
         description="cmd.duviri-circuit.inc-desc",
         extras={"key": "cmd.duviri-circuit.inc-cmd"},
     )
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_circuit_inc(
@@ -350,7 +356,7 @@ class MaintenanceCommands(commands.Cog):
 
     # events (like thermina, fomorian)
     @app_commands.command(name="events", description="cmd.events.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_ingame_events(
@@ -360,21 +366,25 @@ class MaintenanceCommands(commands.Cog):
 
     # setup alert
     @app_commands.command(name="alert-set", description="cmd.alert-set.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def noti_subscribe(self, interact: discord.Interaction):
         await cmd_helper_maintenance(interact, "noti-set")
 
     @app_commands.command(name="alert-delete", description="cmd.alert-delete.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def noti_unsubscribe(self, interact: discord.Interaction):
         await cmd_helper_maintenance(interact, "noti-delete")
 
     @app_commands.command(name="descendia", description="cmd.descendia.desc")
-    @discord.app_commands.checks.cooldown(
+    @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
     async def cmd_descendia(
@@ -391,7 +401,7 @@ class MaintenanceCommands(commands.Cog):
 
     @app_commands.command(name="party", description="cmd.party.desc")
     @app_commands.checks.cooldown(
-        1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
+        1, COOLDOWN_CREATE, key=lambda i: (i.guild_id, i.user.id)
     )
     @app_commands.describe(
         title="cmd.party.desc-title",
@@ -404,7 +414,7 @@ class MaintenanceCommands(commands.Cog):
         self,
         interact: discord.Interaction,
         title: str,
-        game_name: str,
+        game_name: str = "워프레임",
         departure: str = None,
         descriptions: str = ts.get(f"cmd.party.c-no-desc"),
         number_of_user: int = 4,
@@ -414,9 +424,9 @@ class MaintenanceCommands(commands.Cog):
             f"party//{title}//{game_name}//{departure}//{descriptions}//{number_of_user} ",
         )
 
-    @app_commands.command(name="trade", description="cmd.trade.desc")
+    @app_commands.command(name="trade", description=f"cmd.trade.desc")
     @app_commands.checks.cooldown(
-        1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
+        1, COOLDOWN_CREATE, key=lambda i: (i.guild_id, i.user.id)
     )
     @app_commands.choices(
         trade_type=[
@@ -465,6 +475,8 @@ class MaintenanceCommands(commands.Cog):
     @discord.app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def cmd_user_warn(
         self,
         interact: discord.Interaction,
@@ -479,6 +491,8 @@ class MaintenanceCommands(commands.Cog):
     @app_commands.checks.cooldown(
         1, COOLDOWN_5_MIN, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def register_channel(self, interact: discord.Interaction):
         await cmd_helper_maintenance(interact, "register")
 

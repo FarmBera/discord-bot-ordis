@@ -372,7 +372,7 @@ class GeneralCommands(commands.Cog):
             isPrivateMsg=developer_options,
         )
 
-    # # voidTrader item command
+    # voidTrader item command
     @app_commands.command(
         name="void-traders-item", description="cmd.void-traders-item.desc"
     )
