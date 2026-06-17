@@ -501,6 +501,8 @@ class GeneralCommands(commands.Cog):
     @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def noti_subscribe(self, interact: discord.Interaction):
         await noti_subscribe_helper(interact)
 
@@ -508,6 +510,8 @@ class GeneralCommands(commands.Cog):
     @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def noti_unsubscribe(self, interact: discord.Interaction):
         await noti_unsubscribe_helper(interact)
 
@@ -529,6 +533,8 @@ class GeneralCommands(commands.Cog):
     @app_commands.checks.cooldown(
         1, COOLDOWN_5_MIN, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def register_channel(self, interact: discord.Interaction):
         await register_cmd_helper(interact)
 
@@ -585,6 +591,8 @@ class GeneralCommands(commands.Cog):
     @app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def cmd_check_queue_list(self, interact: discord.Interaction):
         await interact.response.defer(ephemeral=True)
         if not await is_super_user(interact, "check-queue", True, True):

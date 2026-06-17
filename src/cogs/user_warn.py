@@ -23,6 +23,8 @@ class UserWarnCommands(commands.Cog):
     @discord.app_commands.checks.cooldown(
         1, COOLDOWN_DEFAULT, key=lambda i: (i.guild_id, i.user.id)
     )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only()
     async def cmd_user_warn(
         self,
         interact: discord.Interaction,
