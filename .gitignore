@@ -24,7 +24,6 @@
 # personal file
 /config/channel.yml
 /config/TOKEN.py
-/config/roles.py
 /src/utils/emoji.py
 
 /.markdownlint.json

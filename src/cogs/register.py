@@ -2,7 +2,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from src.commands.noti_channel import noti_subscribe_helper, noti_unsubscribe_helper
 from src.constants.keys import (
     # cooldown var
     COOLDOWN_DEFAULT,
@@ -66,6 +65,7 @@ from src.services.queue_manager import get_queue_status
 from src.translator import ts, locale_to_lang
 from src.utils.cmd_helper import cmd_helper, cmd_helper_txt
 from src.utils.permission import is_super_user
+from src.views.noti_channel import noti_subscribe_helper, noti_unsubscribe_helper
 from src.views.register_view import register_cmd_helper
 
 

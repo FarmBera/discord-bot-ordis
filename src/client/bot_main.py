@@ -10,9 +10,9 @@ from discord.ext import commands, tasks
 from config.TOKEN import base_url_profile
 from config.config import LOG_TYPE
 from src.bot_translator import BotTranslator
-from src.commands.noti_channel import DB_COLUMN_MAP, PROFILE_CONFIG
 from src.constants.color import C
 from src.constants.keys import MSG_BOT
+from src.constants.notification import PROFILE_CONFIG
 from src.services.party_service import PartyService
 from src.services.queue_manager import GLOBAL_QUEUE, JobType
 from src.services.trade_service import TradeService
@@ -23,6 +23,7 @@ from src.utils.delay import delay
 from src.utils.logging_utils import save_log
 from src.utils.return_err import return_traceback
 from src.utils.times import timeNowDT
+from src.views.noti_channel import DB_COLUMN_MAP
 from src.views.party_view import PartyView
 from src.views.trade_view import TradeView
 

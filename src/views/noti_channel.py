@@ -1,147 +1,14 @@
 import discord
 
 from config.config import LOG_TYPE
-from src.constants.keys import (
-    ALERTS,
-    NEWS,
-    SORTIE,
-    ARCHONHUNT,
-    VOIDTRADERS,
-    STEELPATH,
-    ARCHIMEDEA,
-    CALENDAR,
-    DAILYDEALS,
-    INVASIONS,
-    DUVIRI_ROTATION,
-    EVENTS,
-    #
-    DUVIRI_U_K_W,
-    DUVIRI_U_K_I,
-    #
-    ARCHIMEDEA_DEEP,
-    ARCHIMEDEA_TEMPORAL,
-    CETUSCYCLE,
-    DUVIRICYCLE,
-    CAMBIONCYCLE,
-    VALLISCYCLE,
-    BOUNTY,
-    DESCENDIA,
-)
+from src.constants.notification import NOTI_LABELS, pfs, DB_COLUMN_MAP, pfu
+from src.services.alert_service import fetch_current_subscriptions
 from src.translator import ts
 from src.utils.db_helper import transaction
 from src.utils.logging_utils import save_log
 from src.utils.return_err import return_traceback
 from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
-
-DB_COLUMN_MAP = {
-    ALERTS: "sub_alerts",
-    NEWS: "sub_news",
-    SORTIE: "sub_sortie",
-    ARCHONHUNT: "sub_archonhunt",
-    VOIDTRADERS: "sub_voidtraders",
-    f"{ARCHIMEDEA}{ARCHIMEDEA_DEEP}": "sub_darchimedea",
-    f"{ARCHIMEDEA}{ARCHIMEDEA_TEMPORAL}": "sub_tarchimedea",
-    STEELPATH: "sub_steelpath",
-    CALENDAR: "sub_calendar",
-    DAILYDEALS: "sub_dailydeals",
-    INVASIONS: "sub_invasions",
-    f"{DUVIRI_ROTATION}{DUVIRI_U_K_W}": "sub_duviri_wf",
-    f"{DUVIRI_ROTATION}{DUVIRI_U_K_I}": "sub_duviri_inc",
-    EVENTS: "sub_events",
-    CETUSCYCLE: "sub_cetus",
-    DUVIRICYCLE: "sub_duviri",
-    CAMBIONCYCLE: "sub_cambion",
-    VALLISCYCLE: "sub_vallis",
-    BOUNTY: "sub_bounty",
-    DESCENDIA: "sub_descend",
-}
-
-# UI selection
-PF_LABEL: str = "noti-label."
-NOTI_LABELS = {
-    ALERTS: ts.get(f"{PF_LABEL}{ALERTS}"),
-    NEWS: ts.get(f"{PF_LABEL}{NEWS}"),
-    SORTIE: ts.get(f"{PF_LABEL}{SORTIE}"),
-    ARCHONHUNT: ts.get(f"{PF_LABEL}{ARCHONHUNT}"),
-    VOIDTRADERS: ts.get(f"{PF_LABEL}{VOIDTRADERS}"),
-    f"{ARCHIMEDEA}{ARCHIMEDEA_DEEP}": ts.get(
-        f"{PF_LABEL}{ARCHIMEDEA}{ARCHIMEDEA_DEEP}"
-    ),
-    f"{ARCHIMEDEA}{ARCHIMEDEA_TEMPORAL}": ts.get(
-        f"{PF_LABEL}{ARCHIMEDEA}{ARCHIMEDEA_TEMPORAL}"
-    ),
-    STEELPATH: ts.get(f"{PF_LABEL}{STEELPATH}"),
-    CALENDAR: ts.get(f"{PF_LABEL}{CALENDAR}"),
-    DAILYDEALS: ts.get(f"{PF_LABEL}{DAILYDEALS}"),
-    INVASIONS: ts.get(f"{PF_LABEL}{INVASIONS}"),
-    f"{DUVIRI_ROTATION}{DUVIRI_U_K_W}": ts.get(
-        f"{PF_LABEL}{DUVIRI_ROTATION}{DUVIRI_U_K_W}"
-    ),
-    f"{DUVIRI_ROTATION}{DUVIRI_U_K_I}": ts.get(
-        f"{PF_LABEL}{DUVIRI_ROTATION}{DUVIRI_U_K_I}"
-    ),
-    EVENTS: ts.get(f"{PF_LABEL}{EVENTS}"),
-    CETUSCYCLE: ts.get(f"{PF_LABEL}{CETUSCYCLE}"),
-    DUVIRICYCLE: ts.get(f"{PF_LABEL}{DUVIRICYCLE}"),
-    CAMBIONCYCLE: ts.get(f"{PF_LABEL}{CAMBIONCYCLE}"),
-    VALLISCYCLE: ts.get(f"{PF_LABEL}{VALLISCYCLE}"),
-    BOUNTY: ts.get(f"{PF_LABEL}{BOUNTY}"),
-}
-
-# profile name & image
-PROFILE_CONFIG: dict = {
-    VOIDTRADERS: {"name": ts.get(f"{PF_LABEL}trader"), "avatar": "baro"},
-    f"{ARCHIMEDEA}{ARCHIMEDEA_DEEP}": {
-        "name": ts.get(f"{PF_LABEL}deep"),
-        "avatar": "deep",
-    },
-    f"{ARCHIMEDEA}{ARCHIMEDEA_TEMPORAL}": {
-        "name": ts.get(f"{PF_LABEL}temporal"),
-        "avatar": "temporal",
-    },
-    DAILYDEALS: {"name": ts.get(f"{PF_LABEL}darvo"), "avatar": "darvo"},
-}
-
-pfs: str = "cmd.alert-set."  # prefix select
-pfu: str = "cmd.alert-delete."  # prefix unselect
-
-
-async def fetch_current_subscriptions(db, channel_id: int) -> list:
-    """
-    get the current list of notifications subscribed to interacted channel from the db.
-    """
-    active_labels = []
-    cols = list(DB_COLUMN_MAP.values())
-    # column name mapping
-    col_to_key = {v: k for k, v in DB_COLUMN_MAP.items()}
-
-    query = f"SELECT {', '.join(cols)} FROM webhooks WHERE channel_id = %s"
-    try:
-        async with transaction(db) as cursor:
-            await cursor.execute(query, (channel_id,))
-            row = await cursor.fetchone()
-
-        if row:
-            for col_name in cols:
-                val = row[col_name]
-
-                if val == 1:
-                    key = col_to_key.get(col_name)
-                    # convert labels
-                    if key and key in NOTI_LABELS:
-                        active_labels.append(NOTI_LABELS[key])
-    except Exception as e:
-        await save_log(
-            pool=db,
-            type=LOG_TYPE.cmd,
-            cmd="fetch_current_subscriptions",
-            msg="db select error",  # VAR
-            obj=return_traceback(),
-        )
-        print(f"[Error] fetch_current_subscriptions: {e}")
-
-    return active_labels
 
 
 class NotificationSelect(discord.ui.Select):
