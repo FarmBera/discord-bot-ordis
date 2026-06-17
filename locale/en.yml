@@ -445,7 +445,7 @@ cmd:
     pc-joined1: "{host}, {user} has joined the party!"
     pc-joined2: "{host}, {user} has quickly joined!"
     pc-joined3: "{host}, {user} has appeared!"
-    pc-joined4: "{host}, welcome, {user}!"
+    pc-joined4: "{host}, welcome {user}!"
     pc-lefted: "{host}, {user} has left the party."
     pc-lefted-force: "{host}, {user} has left the party. (by host)"
 
@@ -736,7 +736,7 @@ cmd:
     err-channel: |
       Error: The Feedback channel be found.
       Please register the channel using the `/register` command.
-      
+
       If the issue persists, please contact to the support server.
 
   alert:
@@ -788,6 +788,7 @@ cmd:
     desc: "[Beta] Display this week's Descent mission list."
 
     title: "# Weekly Descent Challenges\n"
+    remain: "> Expiry: {time}\n"
 
   register:
     cmd: register
