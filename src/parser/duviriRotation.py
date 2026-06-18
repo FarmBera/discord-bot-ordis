@@ -148,5 +148,5 @@ def w_duviri_incarnon(incarnon, ts=_ts, lang=_default_lang) -> discord.Embed:
     return create_embed(output_msg=output_msg, color=0x65E6E1, lang=lang)
 
 
-print(w_duviri_warframe(get_obj(f"{DUVIRI_ROTATION}")).description)
-print(w_duviri_incarnon(get_obj(f"{DUVIRI_ROTATION}")).description)
+# print(w_duviri_warframe(get_obj(f"{DUVIRI_ROTATION}")).description)
+# print(w_duviri_incarnon(get_obj(f"{DUVIRI_ROTATION}")).description)
