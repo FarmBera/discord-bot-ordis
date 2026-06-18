@@ -108,7 +108,7 @@ class TASKcheck_new_content(commands.Cog):
         if not checkCircuitWarframe(obj_new):
             return None
         try:
-            await setDuvWarframe(obj_new[0])
+            await setDuvWarframe(obj_new[0]["CategoryChoices"][0])
         except Exception as e:
             msg = f"parse error in handle_duviri_rotation-1 {handler['parser']}/{e}"
             await handleParseError(self.bot.db, msg, key)
@@ -120,7 +120,7 @@ class TASKcheck_new_content(commands.Cog):
         if not checkCircuitIncarnon(obj_new):
             return None
         try:
-            await setDuvIncarnon(obj_new[1])
+            await setDuvIncarnon(obj_new[0]["CategoryChoices"][1])
         except Exception as e:
             msg = f"parse error in handle_duviri_rotation-2 {handler['parser']}/{e}"
             await handleParseError(self.bot.db, msg, key)

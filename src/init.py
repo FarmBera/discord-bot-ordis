@@ -56,8 +56,8 @@ def make_base_data():
         print(f"{C.cyan}{item}")
 
     unique_obj = get_obj(DUVIRI_ROTATION)
-    set_obj(unique_obj[0], f"{DUVIRI_ROTATION}Warframe")
-    set_obj(unique_obj[1], f"{DUVIRI_ROTATION}Incarnon")
+    set_obj(unique_obj[0]["CategoryChoices"][0], f"{DUVIRI_ROTATION}Warframe")
+    set_obj(unique_obj[0]["CategoryChoices"][1], f"{DUVIRI_ROTATION}Incarnon")
     unique_obj = get_obj(ARCHIMEDEA)
     set_obj(unique_obj[0], f"{ARCHIMEDEA}{ARCHIMEDEA_DEEP}")
     set_obj(unique_obj[1], f"{ARCHIMEDEA}{ARCHIMEDEA_TEMPORAL}")

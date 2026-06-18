@@ -20,9 +20,9 @@
             "voidTraderItem": false,
             "Invasions": true,
             "vallisCycle": true,
-            "EndlessXpChoices": true,
-            "EndlessXpChoicesIncarnon": true,
-            "EndlessXpChoicesWarframe": true,
+            "EndlessXpSchedule": true,
+            "EndlessXpScheduleIncarnon": true,
+            "EndlessXpScheduleWarframe": true,
             "Goals": true,
             "Descents": true,
             "Bounty": true

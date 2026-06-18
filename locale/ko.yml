@@ -54,8 +54,8 @@ noti-label:
   KnownCalendarSeasons: "1999달력"
   DailyDeals: "일일 특가"
   Invasions: "침공"
-  EndlessXpChoicesWarframe: "두비리 순환로 - 워프레임"
-  EndlessXpChoicesIncarnon: "두비리 순환로 - 인카논"
+  EndlessXpScheduleWarframe: "두비리 순환로 - 워프레임"
+  EndlessXpScheduleIncarnon: "두비리 순환로 - 인카논"
   Goals: "이벤트"
   cetusCycle: 지구 - 시터스 주기
   duviriCycle: 두비리 감정 주기

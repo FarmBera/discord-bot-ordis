@@ -63,7 +63,7 @@ def w_duviri_warframe(rotation, ts=_ts, lang=_default_lang) -> discord.Embed:
     if not rotation:
         return err_embed("w_duviri_warframe")
 
-    curr_rotation = rotation[0]["Choices"]
+    curr_rotation = rotation[0]["CategoryChoices"][0]["Choices"]
 
     # title
     output_msg: str = (
@@ -109,7 +109,7 @@ def w_duviri_incarnon(incarnon, ts=_ts, lang=_default_lang) -> discord.Embed:
     if not incarnon:
         return err_embed("w_duviri_warframe")
 
-    curr_rotation = incarnon[1]["Choices"]
+    curr_rotation = incarnon[0]["CategoryChoices"][1]["Choices"]
     # title
     output_msg: str = (
         f"# {ts.get(f'{pf}inc-lvl')} {ts.get(f'{pf}circuit')} - {ts.get(f'{pf}inc-title')}\n"
@@ -148,5 +148,5 @@ def w_duviri_incarnon(incarnon, ts=_ts, lang=_default_lang) -> discord.Embed:
     return create_embed(output_msg=output_msg, color=0x65E6E1, lang=lang)
 
 
-# print(w_duviri_warframe(get_obj(f"{DUVIRI_ROTATION}")).description)
-# print(w_duviri_incarnon(get_obj(f"{DUVIRI_ROTATION}")).description)
+print(w_duviri_warframe(get_obj(f"{DUVIRI_ROTATION}")).description)
+print(w_duviri_incarnon(get_obj(f"{DUVIRI_ROTATION}")).description)
