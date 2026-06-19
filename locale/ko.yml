@@ -964,120 +964,123 @@ trs:
   # name
   "baro ki'teer": 바로 키 티어
 
-  # sortie
-  # "Enhanced Enemy Shields": 강화된 적 실드
-
   # for duviri rotation
 
   # warframes
-  ash: 애쉬 # Ash
-  atlas: 아틀라스 # Atlas
-  banshee: 밴쉬 # Banshee
-  caliban: 칼리반 # Caliban
-  chroma: 크로마 # Chroma
-  cyte-09: Cyte-09 # Cyte-09
-  dagath: 다가스 # Dagath
-  dante: 단테 # Dante
-  ember: 엠버 # Ember
-  equinox: 이쿼녹스 # Equinox
-  excalibur: 엑스칼리버 # Excalibur
-  excalibur umbra: 엑스칼리버 움브라 # Excalibur Umbra
-  frost: 프로스트 # Frost
-  gara: 가라 # Gara
-  garuda: 가루다 # Garuda
-  gauss: 가우스 # Gauss
-  grendel: 그렌델 # Grendel
-  gyre: 가라 # Gyre
-  hydroid: 하이드로이드 # Hydroid
-  inaros: 이나로스 # Inaros
-  ivara: 이바라 # Ivara
-  jade: 제이드 # Jade
-  khora: 코라 # Khora
-  koumei: 코우메이 # Koumei
-  kullervo: 쿨레르보 # Kullervo
-  limbo: 림보 # Limbo
-  loki: 로키 # Loki
-  mag: 매그 # Mag
-  mesa: 메사 # Mesa
-  mirage: 미라지 # Mirage
-  nekros: 네크로스 # Nekros
-  nezha: 나타 # Nezha
-  nidus: 나이더스 # Nidus
-  nova: 노바 # Nova
-  nyx: 닉스 # Nyx
-  oberon: 오베론 # Oberon
-  octavia: 옥타비아 # Octavia
-  protea: 프로티아 # Protea
-  qorvex: 코르벡스 # Qorvex
-  revenant: 레버넌트 # Revenant
-  rhino: 라이노 # Rhino
-  saryn: 새린 # Saryn
-  titania: 티타니아 # Titania
-  trinity: 트리니티 # Trinity
-  valkyr: 발키르 # Valkyr
-  vauban: 바우반 # Vauban
-  volt: 볼트 # Volt
-  voruna: 보루나 # Voruna
-  wisp: 위습 # Wisp
-  wukong: 오공 # Wukong
-  xaku: 자쿠 # Xaku
-  yareli: 야렐리 # Yareli
-  zephyr: 제피르 # Zephyr
-  baruuk: 바루크 # Baruuk
-  citrine: 시트린 # Citrine
-  harrow: 해로우 # Harrow
-  hildryn: 힐드린 # Hildryn
-  lavos: 라보스 # Lavos
-  oraxia: 오릭시아 # Oraxia
-  sevagoth: 세바고스 # Sevagoth
-  styanax: 스티아낙스 # Styanax
-  temple: 템플 # Temple
+  ash: 애쉬
+  atlas: 아틀라스
+  banshee: 밴쉬
+  caliban: 칼리반
+  chroma: 크로마
+  cyte-09: Cyte-09
+  dagath: 다가스
+  dante: 단테
+  ember: 엠버
+  equinox: 이쿼녹스
+  excalibur: 엑스칼리버
+  excalibur umbra: 엑스칼리버 움브라
+  frost: 프로스트
+  gara: 가라
+  garuda: 가루다
+  gauss: 가우스
+  grendel: 그렌델
+  gyre: 가라
+  hydroid: 하이드로이드
+  inaros: 이나로스
+  ivara: 이바라
+  jade: 제이드
+  khora: 코라
+  koumei: 코우메이
+  kullervo: 쿨레르보
+  limbo: 림보
+  loki: 로키
+  mag: 매그
+  mesa: 메사
+  mirage: 미라지
+  nekros: 네크로스
+  nezha: 나타
+  nidus: 나이더스
+  nova: 노바
+  nyx: 닉스
+  oberon: 오베론
+  octavia: 옥타비아
+  protea: 프로티아
+  qorvex: 코르벡스
+  revenant: 레버넌트
+  rhino: 라이노
+  saryn: 새린
+  titania: 티타니아
+  trinity: 트리니티
+  valkyr: 발키르
+  vauban: 바우반
+  volt: 볼트
+  voruna: 보루나
+  wisp: 위습
+  wukong: 오공
+  xaku: 자쿠
+  yareli: 야렐리
+  zephyr: 제피르
+  baruuk: 바루크
+  citrine: 시트린
+  harrow: 해로우
+  hildryn: 힐드린
+  lavos: 라보스
+  oraxia: 오릭시아
+  sevagoth: 세바고스
+  styanax: 스티아낙스
+  temple: 템플
 
   # week 1
-  braton: 브래튼 # Braton
-  lato: 라토 # Lato
-  skana: 스카나 # Skana
-  paris: 패리스 # Paris
-  kunai: 쿠나이 # Kunai
+  braton: 브래튼
+  lato: 라토
+  skana: 스카나
+  paris: 패리스
+  kunai: 쿠나이
   # week 2
-  boar: 보어 # Boar
-  gammacor: 감마코어 # Gammacor
-  angstrum: 앙스트럼 # Angstrum
-  gorgon: 고르곤 # Gorgon
-  anku: 안쿠 # Anku
+  boar: 보어
+  gammacor: 감마코어
+  angstrum: 앙스트럼
+  gorgon: 고르곤
+  anku: 안쿠
   # week 3
-  bo: 보 # Bo
-  latron: 래트론 # Latron
-  furis: 퓨리스 # Furis
-  furax: 퓨랙스 # Furax
-  strun: 스트런 # Strun
+  bo: 보
+  latron: 래트론
+  furis: 퓨리스
+  furax: 퓨랙스
+  strun: 스트런
   # week 4
-  lex: 렉스 # Lex
-  magistar: 마기스타 # Magistar
-  boltor: 볼터 # Boltor
-  bronco: 브롱코 # Bronco
-  ceramicdagger: 세라믹 대거 # Ceramic Dagger
+  lex: 렉스
+  magistar: 마기스타
+  boltor: 볼터
+  bronco: 브롱코
+  ceramicdagger: 세라믹 대거
   # week 5
-  torid: 토리드 # Torid
-  dualtoxocyst: 듀얼 톡소시스트 # Dual Toxocyst
-  dualichor: 듀얼 이코르 # Dual Ichor
-  miter: 마이터 # Miter
-  atomos: 아토모스 # Atomos
+  torid: 토리드
+  dualtoxocyst: 듀얼 톡소시스트
+  dualichor: 듀얼 이코르
+  miter: 마이터
+  atomos: 아토모스
   # week 6
   ackandbrunt: 아크&브런트 # "Ack & Brunt"
-  soma: 소마 # Soma
-  vasto: 바스토 # Vasto
-  namisolo: 나미 솔로 # Nami Solo
-  burston: 버스튼 # Burston
+  soma: 소마
+  vasto: 바스토
+  namisolo: 나미 솔로
+  burston: 버스튼
   # week 7
-  zylok: 자일락 # Zylok
-  sibear: 시비어 # Sibear
-  dread: 드레드 # Dread
-  despair: 디스페어 # Despair
-  hate: 헤이트 # Hate
+  zylok: 자일락
+  sibear: 시비어
+  dread: 드레드
+  despair: 디스페어
+  hate: 헤이트
   # week 8
-  dera: 데라 # Dera
-  sybaris: 시바리스 # Sybaris
-  cestra: 세스트라 # Cestra
-  sicarus: 시카루스 # Sicarus
-  okina: 오키나 # Okina
+  dera: 데라
+  sybaris: 시바리스
+  cestra: 세스트라
+  sicarus: 시카루스
+  okina: 오키나
+  # week 9
+  vectis: 백티스
+  stug: 스터그
+  ballistica: 발리스티카
+  destreza: 데스트레자
+  obex: 오벡스
