@@ -477,8 +477,8 @@ class TradeView(ui.View):
     @staticmethod
     async def check_permissions(interact, trade_data, cmd: str = ""):
         is_host = interact.user.id == trade_data["host_id"]
-        is_admin = await is_admin_user(interact, notify=False, cmd=cmd)
         if not is_host:
+            is_admin = await is_admin_user(interact, notify=False, cmd=cmd)
             if not is_admin:
                 await interact.response.send_message(
                     ts.get(f"{pf}err-only-host"), ephemeral=True

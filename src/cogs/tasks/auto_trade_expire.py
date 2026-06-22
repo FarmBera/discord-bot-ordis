@@ -63,7 +63,7 @@ class tasks_auto_trade_expire(commands.Cog):
 
         for trade in expired_trades:
             try:
-                thread = self.bot.get_channel(trade["thread_id"])
+                thread = self.bot.fetch_channel(trade["thread_id"])
                 await thread.edit(locked=True)  # lock thread
                 await delay()
 

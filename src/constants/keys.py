@@ -2,14 +2,14 @@ from config.config import language as lang
 
 # commands cooldown time (sec)
 CDN: float = 1.0
-COOLDOWN_DEFAULT: float = 10.0
-COOLDOWN_SHORT: float = 2.0
-COOLDOWN_ACTION: float = 60.0
-COOLDOWN_CREATE: float = 60.0
-COOLDOWN_BTN_ACTION: float = 15.0  # btn join/leave
-COOLDOWN_BTN_MANAGE: float = 15.0  # btn modify/remove
-COOLDOWN_5_MIN: float = 300.0  # 5 minute cooldown
-COOLDOWN_BTN_CALL: float = 900.0  # btn call members
+COOLDOWN_DEFAULT: float = CDN
+COOLDOWN_SHORT: float = CDN
+COOLDOWN_ACTION: float = CDN
+COOLDOWN_CREATE: float = CDN
+COOLDOWN_BTN_ACTION: float = CDN  # btn join/leave
+COOLDOWN_BTN_MANAGE: float = CDN  # btn modify/remove
+COOLDOWN_5_MIN: float = CDN  # 5 minute cooldown
+COOLDOWN_BTN_CALL: float = CDN  # btn call members
 
 
 FIELD_PATTERN: str = "\n"
