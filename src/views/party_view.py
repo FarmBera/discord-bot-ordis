@@ -1,5 +1,3 @@
-import datetime as dt
-
 import discord
 from discord import ui
 from discord.ext import commands
@@ -20,7 +18,7 @@ from src.utils.permission import (
     is_banned_user,
 )
 from src.utils.return_err import return_traceback
-from src.utils.times import convert_remain, parseKoreanDatetime
+from src.utils.times import convert_remain
 from src.views.consent_view import check_consent
 from src.views.help_view import SupportView
 
@@ -68,15 +66,9 @@ async def build_party_embed(
     desc_field = data.get("description", "")
 
     departure_data = data["departure"]
-    if isinstance(departure_data, dt.datetime):
-        time_output = convert_remain(departure_data.timestamp())
-    else:
-        try:
-            time = convert_remain(parseKoreanDatetime(departure_data).timestamp())
-        except Exception:
-            time = None
-
-        time_output = time if time else ts.get(f"{pf}pb-departure-none")
+    time_output = convert_remain(departure_data)
+    if time_output is None or not time_output:
+        time_output = ts.get(f"{pf}pb-departure-none")
 
     description += f"""### {data['title']} {status_text}
 - **{ts.get(f'{pf}pb-departure')}:** {time_output}
@@ -140,6 +132,7 @@ class PartyEditAllModal(ui.Modal, title=ts.get(f"{pf}edit-all-title")):
         self.current_mission = party_data["game_name"] or ""
         self.current_desc = party_data["description"] or ""
         self.current_max_users = int(party_data["max_users"])
+        self.current_departure = party_data["departure"]
         self.participants_count = len(participants)
 
         self.title_input = ui.TextInput(
@@ -166,7 +159,7 @@ class PartyEditAllModal(ui.Modal, title=ts.get(f"{pf}edit-all-title")):
         self.date_input = ui.TextInput(
             label=ts.get(f"{pf}date-input"),
             placeholder=ts.get(f"{pf}date-placeholder"),
-            default="",  # blank = keep existing departure
+            default=self.current_departure,
             required=False,
         )
         self.add_item(self.date_input)
@@ -209,7 +202,7 @@ class PartyEditAllModal(ui.Modal, title=ts.get(f"{pf}edit-all-title")):
         else:
             new_mission = mission_val
 
-        new_description = self.desc_input.value
+        new_description = self.desc_input.value.strip()
 
         # max participants
         size_str = self.size_input.value.strip()
@@ -234,19 +227,7 @@ class PartyEditAllModal(ui.Modal, title=ts.get(f"{pf}edit-all-title")):
                 new_max_users = parsed_size
 
         # departure
-        date_val = self.date_input.value.strip()
-        if date_val:
-            try:
-                parsed_dt = parseKoreanDatetime(date_val)
-            except Exception:
-                parsed_dt = None
-            if parsed_dt is None:
-                errors.append(
-                    f"- {ts.get(f'{pf}date-input')}: "
-                    f"{ts.get(f'{pf}date-err-parse')}"
-                )
-            else:
-                new_departure = parsed_dt
+        new_departure = self.date_input.value.strip()
 
         if errors:
             await interact.response.send_message("\n".join(errors), ephemeral=True)
@@ -270,7 +251,7 @@ class PartyEditAllModal(ui.Modal, title=ts.get(f"{pf}edit-all-title")):
         if new_departure is not None:
             # Departure comparison: only send if user actually typed a value;
             diff_kwargs["departure"] = new_departure
-            change_log.append(f"departure:{date_val}")
+            change_log.append(f"departure:{new_departure}")
 
         if not diff_kwargs:
             await interact.response.send_message(
@@ -314,7 +295,7 @@ class PartyEditAllModal(ui.Modal, title=ts.get(f"{pf}edit-all-title")):
                 msg="PartyEditAllModal -> Submit, but ERR",
                 obj=(
                     f"T:{title_val}\nM:{mission_val}\nSIZE:{size_str}\n"
-                    f"DATE:{date_val}\nDESC:{self.desc_input.value}\n"
+                    f"DATE:{new_departure}\nDESC:{self.desc_input.value}\n"
                     f"{return_traceback()}"
                 ),
             )

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS party
     host_id       BIGINT UNSIGNED,
     title         TEXT,
     game_name     TEXT,
-    departure     DATETIME          DEFAULT CURRENT_TIMESTAMP,
+    departure     VARCHAR(50)       DEFAULT NULL,
     max_users     INTEGER,
     `description` TEXT,
     `status`      VARCHAR(20)       DEFAULT '모집 중',

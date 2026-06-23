@@ -399,7 +399,7 @@ cmd:
     arg-number-of-user: 모집_인원_수
     desc-title: 파티 모집 제목
     desc-game-name: "[선택사항] 같이 플레이 할 게임 이름 (기본값: 워프레임)"
-    desc-departure: "[선택사항] 입력 예시) 미정, 내일 오후 3시, 다음주 토요일 15시, 23일 17시 등"
+    desc-departure: "[선택사항] 출발할 시간 (빈칸 시 미정)"
     desc-descriptions: "[선택사항] 모집 글에 대한 세부설명"
     desc-number-of-user: "[선택사항] 본인을 포함한 최대 파티원 수 (기본값: 4명)"
 
@@ -431,8 +431,8 @@ cmd:
     # PartyDateEditModal
     date-btn: "출발일 변경"
     date-title: 출발 시각 & 날짜 수정하기
-    date-input: 변경할 날짜 및 시간을 입력해주세요.
-    date-placeholder: "예) 미정, 내일 오후 3시, 다음주 토요일 15시, 23일 17시 등"
+    date-input: 변경할 날짜 & 시간을 입력해주세요.
+    date-placeholder: "(빈칸으로 둘 시 미정)"
     # ConfirmDeleteView
     del-btny: Yes (진행)
     del-btnn: No (취소)

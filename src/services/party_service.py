@@ -6,7 +6,6 @@ from src.translator import ts
 from src.utils.db_helper import transaction, query_reader
 from src.utils.delay import delay
 from src.utils.logging_utils import save_log
-from src.utils.times import parseKoreanDatetime
 from src.utils.webhook import webhook_send, webhook_edit
 
 pf = "cmd.party."
@@ -42,8 +41,6 @@ class PartyService:
         max_users,
         desc,
     ):
-        departure_dt = parseKoreanDatetime(departure_str) if departure_str else None
-
         async with transaction(pool) as cursor:
             # insert party info
             await cursor.execute(
@@ -52,7 +49,7 @@ class PartyService:
                     host_id,
                     title,
                     game_name,
-                    departure_dt,
+                    departure_str,
                     max_users,
                     ts.get(f"{pf}pv-ing"),
                     desc,

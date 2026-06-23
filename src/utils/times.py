@@ -33,7 +33,7 @@ def unixToDatetime(time: int) -> dt.datetime:
     return dt.datetime.fromtimestamp(time / 1000 if time > 10**12 else time)
 
 
-def convert_remain(timestamp: int | float | str) -> str:
+def convert_remain(timestamp: int | float | str):
     """convert unix timestamp into discord timestamp (like `<t:{TIMESTAMP}:R>`)
 
     :param timestamp: unix timestamp with [int, float, str] type
@@ -42,8 +42,9 @@ def convert_remain(timestamp: int | float | str) -> str:
     try:
         ts_str = str(int(timestamp))
         ts_int = int(ts_str) // 1000 if len(ts_str) == 13 else int(ts_str)
-    except (ValueError, TypeError):
-        return "*Time ERR*"
+        dt.datetime.fromtimestamp(ts_int)
+    except:
+        return timestamp
 
     return f"<t:{ts_int}:R>"
 

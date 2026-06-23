@@ -399,7 +399,7 @@ cmd:
     arg-number-of-user: number_of_user
     desc-title: Party Title
     desc-game-name: Game Name to play together
-    desc-departure: "예) 미정, 내일 오후 3시, 다음주 토요일 15시, 23일 17시 등"
+    desc-departure: "Departure date & time"
     desc-descriptions: "[Optional] Detailed Description of the Recruitment Post"
     desc-number-of-user: "[Optional] Max party size (including yourself)"
 
@@ -432,7 +432,7 @@ cmd:
     date-btn: "Change Dep."
     date-title: Modify Departure Time & Date
     date-input: Please enter the date and time you wish to change.
-    date-placeholder: "예) 미정, 내일 오후 3시, 다음주 토요일 15시, 23일 17시 등"
+    date-placeholder: "Not Specified if leave here empty"
     # ConfirmDeleteView
     del-btny: Yes (Continue)
     del-btnn: No (Cancel)
