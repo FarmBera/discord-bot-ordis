@@ -63,8 +63,7 @@
 | locale/         | UI string translations (YAML)                                                                     |
 | src/            | Bot core codes                                                                                    |
 | ㄴ`src/client`   | Overall Structure of the Bot                                                                      |
-| ㄴ`src/cogs`     | List of Slash Commands and Registration Methods                                                   |
-| ㄴ`src/commands` | Legacy slash commands                                                                             |
+| ㄴ`src/cogs`     | List of Slash Commands and Registration Methods                                                   | |
 | ㄴ`src/handler`  | Change-detection logic for specific content types                                                 |
 | ㄴ`src/parser`   | Convert JSON data received via API into text or a Discord Embed                                   |
 | ㄴ`src/services` | Business logic for party, trade, channel, warn systems                                            |
