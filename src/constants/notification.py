@@ -23,6 +23,7 @@ from src.constants.keys import (
     VALLISCYCLE,
     BOUNTY,
     DESCENDIA,
+    SEASONINFO,
 )
 from src.translator import ts
 
@@ -47,6 +48,7 @@ DB_COLUMN_MAP = {
     VALLISCYCLE: "sub_vallis",
     BOUNTY: "sub_bounty",
     DESCENDIA: "sub_descend",
+    SEASONINFO: "sub_nightwave",
 }
 
 # UI selection
@@ -80,6 +82,7 @@ NOTI_LABELS = {
     VALLISCYCLE: ts.get(f"{PF_LABEL}{VALLISCYCLE}"),
     BOUNTY: ts.get(f"{PF_LABEL}{BOUNTY}"),
     DESCENDIA: ts.get(f"{PF_LABEL}{DESCENDIA}"),
+    SEASONINFO: ts.get(f"{PF_LABEL}{SEASONINFO}"),
 }
 
 # profile name & image

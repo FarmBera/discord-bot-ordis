@@ -1,9 +1,9 @@
 import discord
 
+from src.parser.worldstate import weekly_remain
 from src.translator import ts as _ts, language as _default_lang
 from src.utils.data_manager import getLanguage
 from src.utils.return_err import err_embed
-from src.utils.times import convert_remain
 
 pf: str = "cmd.seasoninfo."
 
@@ -16,12 +16,10 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
     :return: parsed nightwave data & img file name
     """
     if not season:
-        return err_embed("nightwave (seasoninfo)"), ""
+        return err_embed("nightwave object missing"), ""
 
     output_msg: str = ts.get(f"{pf}title")
-    output_msg += ts.get(f"{pf}expiry").format(
-        time=convert_remain(season["Expiry"]["$date"]["$numberLong"])
-    )
+    output_msg += ts.get(f"{pf}expiry").format(time=weekly_remain())
     preset = ts.get(f"{pf}output")
     for chal in season["ActiveChallenges"]:
         output_msg += preset.format(
@@ -34,4 +32,6 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
     return embed, "nightwave"
 
 
+# from src.constants.keys import SEASONINFO
+# from src.utils.data_manager import get_obj
 # print(w_nightwave(get_obj(SEASONINFO))[0].description)

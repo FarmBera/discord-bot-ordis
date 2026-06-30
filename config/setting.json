@@ -25,23 +25,27 @@
             "EndlessXpScheduleWarframe": true,
             "Goals": true,
             "Descents": true,
-            "Bounty": true
+            "Bounty": true,
+            "SeasonInfo": true
         }
     },
     "fissures": {
         "IncludeRailjack": true,
         "favMission": [
             "Extermination",
-            "Rescue",
             "Capture",
             "Void Cascade",
+            "Defense",
             "섬멸",
-            "구출",
             "생포",
-            "보이드 범람"
+            "보이드 범람",
+            "방어"
         ],
         "missionTemp": [
-            "Excavation"
+            "Rescue",
+            "Excavation",
+            "발굴",
+            "구출",
         ],
         "tierExcept": [],
         "tierTemp": [
