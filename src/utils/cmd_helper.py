@@ -43,7 +43,7 @@ async def cmd_helper(
 
     # parse objects
     user_ts = get_ts(interact.locale)
-    user_lang = locale_to_lang(interact.locale)
+    user_lang = "ko-KR" if not isPrivateMsg else locale_to_lang(interact.locale)
     if skipGetObj:
         obj = parser_func(ts=user_ts, lang=user_lang)
     elif parser_args:
