@@ -843,9 +843,15 @@ cmd:
   seasoninfo:
     cmd: nightwave
     desc: Check Daily/Weekly nightwave quest.
-    title: "# Daily/Weekly Nightwave Quests\n"
-    expiry: "> Expiry: {time}"
-    output: "\n- **{value}**: {desc}"
+    title: |
+      # Daily/Weekly Nightwave Quests
+      > Expiry: {time}
+    daily: |
+      ## Daily
+      {daily}
+    weekly: |
+      ## Weekly
+      {weekly}
 
   consent:
     notice: |

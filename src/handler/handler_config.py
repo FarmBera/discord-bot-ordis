@@ -64,6 +64,7 @@ class LOGIC:
     temporal_archimedea = "handle_temporal_archimedea"
     duviri_wf = "handle_duviri_rotation-1"
     duviri_inc = "handle_duviri_rotation-2"
+    seasoninfo = "handle_seasoninfo"
 
 
 DATA_HANDLERS = {
@@ -161,7 +162,6 @@ DATA_HANDLERS = {
     },
     SEASONINFO: {
         HK.parser: w_nightwave,
-        HK.update_check: lambda prev, new: prev["ActiveChallenges"]
-        != new["ActiveChallenges"],
+        HK.special_logic: LOGIC.seasoninfo,
     },
 }

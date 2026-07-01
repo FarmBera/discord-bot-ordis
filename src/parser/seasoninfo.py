@@ -18,16 +18,33 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
     if not season:
         return err_embed("nightwave object missing"), ""
 
-    output_msg: str = ts.get(f"{pf}title")
-    output_msg += ts.get(f"{pf}expiry").format(time=weekly_remain())
-    preset = ts.get(f"{pf}output")
-    for chal in season["ActiveChallenges"]:
-        output_msg += preset.format(
-            value=getLanguage(chal["Challenge"], "value", lang),
-            desc=getLanguage(chal["Challenge"], "desc", lang),
+    daily: list = []
+    weekly: list = []
+
+    output_msg = ts.get(f"{pf}title").format(time=weekly_remain())
+    preset = "\n- **{value}**: {desc}"
+
+    for item in season["ActiveChallenges"]:
+        challenge = item["Challenge"]
+        output = preset.format(
+            value=getLanguage(challenge, "value", lang),
+            desc=getLanguage(challenge, "desc", lang),
         )
 
-    embed = discord.Embed(description=output_msg, color=discord.Color.darker_grey())
+    if "/daily/" in challenge.lower():
+        daily.append(output)
+    else:
+        weekly.append(output)
+
+    # create output message
+    if daily:
+        output_msg += ts.get(f"{pf}daily").format(daily="".join(daily).strip())
+    if weekly:
+        output_msg += ts.get(f"{pf}weekly").format(weekly="".join(weekly).strip())
+
+    embed = discord.Embed(
+        description=output_msg.strip(), color=discord.Color.darker_grey()
+    )
     embed.set_thumbnail(url="attachment://i.webp")
     return embed, "nightwave"
 

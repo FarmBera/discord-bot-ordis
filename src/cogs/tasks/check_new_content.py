@@ -48,6 +48,7 @@ class TASKcheck_new_content(commands.Cog):
             LOGIC.temporal_archimedea: self._handle_temporal_archimedea,
             LOGIC.no_args: self._handle_no_args,
             LOGIC.bounty: self._handle_bounty,
+            LOGIC.seasoninfo: self._handle_seasoninfo,
         }
 
     # --- handler helpers ---
@@ -223,6 +224,33 @@ class TASKcheck_new_content(commands.Cog):
         factory = _make_factory(handler["parser"], obj_bounty)
         # already saved above (obj_bounty differs from outer obj_new)
         return factory, False
+
+    async def _handle_seasoninfo(self, handler, origin_key, key, obj_prev, obj_new):
+        if obj_prev is None:
+            return None, True
+
+        prev_challenges = obj_prev.get("ActiveChallenges", [])
+        new_challenges = obj_new.get("ActiveChallenges", [])
+
+        should_save = prev_challenges != new_challenges
+
+        # Identify newly added challenges by their Challenge path.
+        prev_paths = {c.get("Challenge") for c in prev_challenges}
+        added_challenges = [
+            c for c in new_challenges if c.get("Challenge") not in prev_paths
+        ]
+        # Future alternative: match by _id.$oid instead of Challenge path
+        # prev_ids = {c["_id"]["$oid"] for c in prev_challenges}
+        # added_challenges = [
+        #     c for c in new_challenges if c["_id"]["$oid"] not in prev_ids
+        # ]
+
+        if not added_challenges:
+            return None, should_save
+
+        obj_for_parse = {**obj_new, "ActiveChallenges": added_challenges}
+        factory = await self._safe_parse(handler, key, obj_for_parse)
+        return factory, should_save
 
     async def _handle_default(self, handler, origin_key, key, obj_prev, obj_new):
         if not handler["update_check"](obj_prev, obj_new):
