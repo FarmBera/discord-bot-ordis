@@ -31,7 +31,6 @@ def weekly_remain(delta: int = 0) -> str:
 def w_worldstate(
     ts: Translator = _ts, lang: str = _default_lang
 ) -> tuple[discord.Embed, str]:
-    # calculate vallis cycle
     try:
         cetus = check_timer_states(CetusTimerData)
         duviri = duviri_cycle.current()
@@ -47,13 +46,13 @@ def w_worldstate(
     worlds = ts.get(f"{pf}world_names")
     states = [
         f"{worldstate_emoji[cetus['current']]} {ts.get(f'cmd.cetus.{cetus['current']}')}",
-        f"{worldstate_emoji[duviri['mood']]} {ts.get(f'cmd.duviri-cycle.{duviri['mood']}')}",
+        f"{worldstate_emoji[duviri.state.label]} {ts.get(f'cmd.duviri-cycle.{duviri.state.label}')}",
         f"{worldstate_emoji[cambion['current']]} {ts.get(f'cmd.cambion.{cambion['current']}')}",
         f"{worldstate_emoji[vallis['current']]} {ts.get(f'cmd.vallis.{vallis['current']}')}",
     ]
     expiry = [
         cetus["time_left"],
-        convert_remain(duviri["timestamp"]),
+        convert_remain(duviri.expires_at),
         cambion["time_left"],
         vallis["time_left"],
     ]
