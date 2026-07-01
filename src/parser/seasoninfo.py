@@ -31,10 +31,10 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
             desc=getLanguage(challenge, "desc", lang),
         )
 
-    if "/daily/" in challenge.lower():
-        daily.append(output)
-    else:
-        weekly.append(output)
+        if "/daily/" in challenge.lower():
+            daily.append(output)
+        else:
+            weekly.append(output)
 
     # create output message
     if daily:
