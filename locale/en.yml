@@ -845,7 +845,7 @@ cmd:
     cmd: nightwave
     desc: Check Daily/Weekly nightwave quest.
     title: |
-      # Daily/Weekly Nightwave Quests
+      # Nightwave Quests
     daily: |
       ## Daily
       {daily}
