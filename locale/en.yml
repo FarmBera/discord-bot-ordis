@@ -41,6 +41,7 @@ time:
   day: d
   hour: h
   min: m
+  remain: "Expiry: {time}"
 
 noti-label:
   Alerts: Alert Missions
@@ -845,7 +846,6 @@ cmd:
     desc: Check Daily/Weekly nightwave quest.
     title: |
       # Daily/Weekly Nightwave Quests
-      > Expiry: {time}
     daily: |
       ## Daily
       {daily}

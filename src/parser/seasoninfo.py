@@ -1,6 +1,5 @@
 import discord
 
-from src.parser.worldstate import weekly_remain
 from src.translator import ts as _ts, language as _default_lang
 from src.utils.data_manager import getLanguage
 from src.utils.return_err import err_embed
@@ -21,7 +20,7 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
     daily: list = []
     weekly: list = []
 
-    output_msg = ts.get(f"{pf}title").format(time=weekly_remain())
+    output_msg = ts.get(f"{pf}title")
     preset = "\n- **{value}**: {desc}"
 
     for item in season["ActiveChallenges"]:

@@ -41,6 +41,7 @@ time:
   day: 일
   hour: 시간
   min: 분
+  remain: "{time} 종료"
 
 noti-label:
   Alerts: "얼럿 미션"
@@ -845,7 +846,6 @@ cmd:
     desc: 일일/주간 퀘스트(나이트웨이브)를 확인합니다.
     title: |
       # 일일/주간 나이트웨이브 퀘스트
-      > {time} 만료
     daily: |
       ## 일일
       {daily}
