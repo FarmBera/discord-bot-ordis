@@ -20,12 +20,13 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
     daily: list = []
     weekly: list = []
 
-    output_msg = ts.get(f"{pf}title")
-    preset = "\n- **{value}**: {desc}"
+    output_msg: str = ts.get(f"{pf}title")
+    preset: str = "- {type}**{value}**: {desc}\n"
 
     for item in season["ActiveChallenges"]:
         challenge = item["Challenge"]
         output = preset.format(
+            type=f'[{ts.get(f"{pf}dd")}] ' if "/daily/" in challenge.lower() else "",
             value=getLanguage(challenge, "value", lang),
             desc=getLanguage(challenge, "desc", lang),
         )
@@ -36,10 +37,13 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
             weekly.append(output)
 
     # create output message
-    if daily:
-        output_msg += ts.get(f"{pf}daily").format(daily="".join(daily).strip())
-    if weekly:
-        output_msg += ts.get(f"{pf}weekly").format(weekly="".join(weekly).strip())
+    output_msg += "".join(daily) + "".join(weekly)
+
+    # # divide daily/weekly heading
+    # if daily:
+    #     output_msg += ts.get(f"{pf}daily").format(daily="".join(daily).strip())
+    # if weekly:
+    #     output_msg += ts.get(f"{pf}weekly").format(weekly="".join(weekly).strip())
 
     embed = discord.Embed(
         description=output_msg.strip(), color=discord.Color.darker_grey()

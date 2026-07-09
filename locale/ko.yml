@@ -852,6 +852,7 @@ cmd:
     weekly: |
       ## 주간
       {weekly}
+    dd: "일일"
 
   consent:
     notice: |
