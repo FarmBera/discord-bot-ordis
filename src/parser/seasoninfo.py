@@ -21,7 +21,8 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
     weekly: list = []
 
     output_msg: str = ts.get(f"{pf}title")
-    preset: str = "- {type}**{value}**: {desc}\n"
+    preset: str = "- {type}**{value}**: {desc}"
+    sep: str = "\n"
 
     for item in season["ActiveChallenges"]:
         challenge = item["Challenge"]
@@ -37,7 +38,7 @@ def w_nightwave(season, ts=_ts, lang=_default_lang) -> tuple[discord.Embed, str]
             weekly.append(output)
 
     # create output message
-    output_msg += "".join(daily) + "".join(weekly)
+    output_msg += sep.join(daily) + sep + sep.join(weekly)
 
     # # divide daily/weekly heading
     # if daily:
